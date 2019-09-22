@@ -3,7 +3,6 @@
     <div>Hello Browser Coin</div>
     <input v-model="incoming" />
     <button @click="submit">Submit</button>
-    <div>{{outgoing}}</div>
     <div>{{message}}</div>
     <button class="handshake" @click="handshake">Join network...</button>
   </div>
@@ -58,13 +57,17 @@ export default {
       });
     },
     pollNodes: function() {
-      console.log("pollNodes hit");
       this.polling = setInterval(async () => {
         const response = await axios.get(
-          "http://localhost:1992/node/requested"
+          "http://localhost:1992/handshake/requested"
         );
-        console.log(response);
-      }, 15000);
+
+        response.data.forEach(handshake => {
+          if (handshake !== this.outgoing) {
+            console.log(handshake);
+          }
+        });
+      }, 5000);
     }
   },
   beforeDestroy() {
