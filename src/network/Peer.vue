@@ -21,8 +21,7 @@ export default {
       outgoing: null,
       pollingHandshakes: null,
       handshakeRequested: false,
-      incomingNode: [],
-      outgoingNodes: [],
+      pairedNodes: [],
       message: ""
     };
   },
@@ -39,9 +38,7 @@ export default {
       });
 
       this.peer.on("signal", data => {
-        console.log("Peer signal: ", data);
         this.outgoing = JSON.stringify(data);
-        console.log(this.outgoing);
       });
 
       this.peer.on("connect", () => {
@@ -56,7 +53,6 @@ export default {
       await setTimeout(async () => {
         handshake.handshakeResponse = this.outgoing;
         handshake.responseId = this.id;
-        console.log(this.outgoing);
         await axios({
           method: "post",
           url: "http://localhost:1992/handshake/response",
@@ -66,12 +62,15 @@ export default {
         });
         console.log("Handshake requested: ", handshake);
       }, 2000);
+      clearInterval(this.pollingHandshakes);
     },
     handleHandshakeResponse(myHandshake) {
       console.log("Handling handshake: ", myHandshake);
-      this.peer.signal(JSON.parse(myHandshake.handshake.handshakeResponse));
+      this.peer.signal(JSON.parse(myHandshake.handshakeResponse));
+      this.pairedNodes.push(myHandshake.responseId);
+      clearInterval(this.pollingHandshakes);
     },
-    requestHandshake: async function() {
+    async requestHandshake() {
       await axios({
         method: "post",
         url: "http://localhost:1992/handshake",
@@ -93,7 +92,7 @@ export default {
       }
       return myHandshake;
     },
-    pollQueuedHandshakes: function() {
+    pollQueuedHandshakes() {
       this.pollingHandshakes = setInterval(async () => {
         const response = await axios.get(
           "http://localhost:1992/handshake/queued"
@@ -106,7 +105,7 @@ export default {
           const myHandshake = this.findMyHandshake(allHandshakes);
           const response = get(myHandshake, "handshake.handshakeResponse");
           if (myHandshake && response) {
-            this.handleHandshakeResponse(myHandshake);
+            this.handleHandshakeResponse(myHandshake.handshake);
           }
         } else {
           const handshake = allHandshakes.pop();
