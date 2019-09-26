@@ -10,7 +10,7 @@
 import Peer from "simple-peer";
 import * as axios from "axios";
 import * as uuid from "uuid/v1";
-import { find, get } from "lodash";
+import { get } from "lodash";
 
 export default {
   name: "Peer",
@@ -69,6 +69,7 @@ export default {
     },
     handleHandshakeResponse(myHandshake) {
       console.log("Handling handshake: ", myHandshake);
+      this.peer.signal(JSON.parse(myHandshake.handshake.handshakeResponse));
     },
     requestHandshake: async function() {
       await axios({
@@ -104,9 +105,7 @@ export default {
         if (this.handshakeRequested) {
           const myHandshake = this.findMyHandshake(allHandshakes);
           const response = get(myHandshake, "handshake.handshakeResponse");
-          console.log(myHandshake, response);
           if (myHandshake && response) {
-            console.log("Found myHandshake: ", myHandshake);
             this.handleHandshakeResponse(myHandshake);
           }
         } else {
