@@ -32,14 +32,16 @@ export default {
     this.initialPeer();
   },
   methods: {
-    initialPeer: function() {
+    initialPeer() {
       this.peer = new Peer({
         initiator: location.hash === "#1",
         trickle: false
       });
 
       this.peer.on("signal", data => {
+        console.log("Peer signal: ", data);
         this.outgoing = JSON.stringify(data);
+        console.log(this.outgoing);
       });
 
       this.peer.on("connect", () => {
@@ -50,11 +52,23 @@ export default {
         this.message = data;
       });
     },
-    handshakeResponse: async function(handshake) {
-      handshake.handshakeResponse = this.outgoing;
-      handshake.responseId = this.id;
-      console.log("handshake: ", handshake);
-      await axios.post("http://localhost:1992/handshake/response", handshake);
+    async makeHandshakeResponse(handshake) {
+      await setTimeout(async () => {
+        handshake.handshakeResponse = this.outgoing;
+        handshake.responseId = this.id;
+        console.log(this.outgoing);
+        await axios({
+          method: "post",
+          url: "http://localhost:1992/handshake/response",
+          data: {
+            handshake
+          }
+        });
+        console.log("Handshake requested: ", handshake);
+      }, 2000);
+    },
+    handleHandshakeResponse(myHandshake) {
+      console.log("Handling handshake: ", myHandshake);
     },
     requestHandshake: async function() {
       await axios({
@@ -67,6 +81,17 @@ export default {
       });
       this.handshakeRequested = true;
     },
+    findMyHandshake(allHandshakes) {
+      let myHandshake;
+      for (let handshake of allHandshakes) {
+        const requestId = get(handshake, "handshake.requestId");
+        if (requestId && requestId === this.id) {
+          myHandshake = handshake;
+          break;
+        }
+      }
+      return myHandshake;
+    },
     pollQueuedHandshakes: function() {
       this.pollingHandshakes = setInterval(async () => {
         const response = await axios.get(
@@ -74,29 +99,25 @@ export default {
         );
 
         const allHandshakes = response.data;
+        console.log("allHandshakes: ", allHandshakes);
 
         if (this.handshakeRequested) {
-          const myHandshake = find(allHandshakes, ["requestId", this.id]);
-          console.log("myhandshake: ", myHandshake);
+          const myHandshake = this.findMyHandshake(allHandshakes);
+          const response = get(myHandshake, "handshake.handshakeResponse");
+          console.log(myHandshake, response);
+          if (myHandshake && response) {
+            console.log("Found myHandshake: ", myHandshake);
+            this.handleHandshakeResponse(myHandshake);
+          }
         } else {
           const handshake = allHandshakes.pop();
           const requestId = get(handshake, "requestId");
           if (requestId && requestId !== this.id) {
+            console.log("Recieved handshake: ", handshake);
             this.peer.signal(JSON.parse(handshake.handshake));
-            this.handshakeResponse(handshake);
+            this.makeHandshakeResponse(handshake);
           }
         }
-
-        // response.data.forEach(response => {
-        //   if (response.handshake !== this.outgoing) {
-        //   } else {
-        //     console.log("handshake: ", response.handshake);
-        //     console.log("handshakeResponse: ", response.handshakeResponse);
-        //     if (response.handshakeResponse) {
-        //       this.handshakeResponse(response.handshakeResponse);
-        //     }
-        //   }
-        //
       }, 5000);
     }
   },
