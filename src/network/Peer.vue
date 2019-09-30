@@ -8,10 +8,8 @@
 
 <script>
 import Peer from "simple-peer";
-import logger from "../services/logger";
-import * as axios from "axios";
 import * as uuid from "uuid/v1";
-import { get } from "lodash";
+import * as handshakeService from "../services/handshake";
 
 export default {
   name: "Peer",
@@ -19,8 +17,10 @@ export default {
     return {
       id: null,
       peer: null,
+      initiator: location.hash === "#1",
       outgoing: null,
       pollingHandshakes: null,
+      pollingResponse: null,
       handshakeRequested: false,
       pairedNodes: [],
       message: ""
@@ -34,7 +34,7 @@ export default {
   methods: {
     initialPeer() {
       this.peer = new Peer({
-        initiator: location.hash === "#1",
+        initiator: this.initiator,
         trickle: false
       });
 
@@ -52,27 +52,31 @@ export default {
     },
     pollQueuedHandshakes() {
       this.pollingHandshakes = setInterval(async () => {
-        const response = await axios.get(
-          "http://localhost:1992/handshake/queued"
-        );
-
-        const allHandshakes = response.data;
-
-        if (this.handshakeRequested) {
-          const myHandshake = this.findMyHandshake(allHandshakes);
-          const response = get(myHandshake, "handshake.handshakeResponse");
-          if (myHandshake && response) {
-            this.handleHandshakeResponse(myHandshake.handshake);
-          }
-        } else {
-          const handshake = allHandshakes.pop();
-          const requestId = get(handshake, "requestId");
-          if (requestId && requestId !== this.id) {
-            this.peer.signal(JSON.parse(handshake.handshake));
-            this.makeHandshakeResponse(handshake);
-          }
+        const handshake = await handshakeService.get();
+        if (!this.handshakeRequested && !this.initiator && handshake.id) {
+          this.peer.signal(JSON.parse(handshake.handshake));
+          await setTimeout(async () => {
+            handshakeService.makeResponse(handshake, this.outgoing, this.id);
+          }, 2000);
         }
       }, 5000);
+    },
+    pollHandshakeResponses() {
+      this.pollingResponse = setInterval(async () => {
+        const handshake = await handshakeService.getResponse(this.id);
+        if (handshake.data.id) {
+          this.peer.signal(JSON.parse(handshake.data.handshakeResponse));
+          clearInterval(this.pollingResponse);
+        }
+      }, 5000);
+    },
+    async requestHandshake() {
+      const success = await handshakeService.request(this.id, this.outgoing);
+      if (success) {
+        this.handshakeRequested = true;
+        clearInterval(this.pollingHandshakes);
+        this.pollHandshakeResponses();
+      }
     }
   },
   beforeDestroy() {
