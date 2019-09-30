@@ -25,7 +25,7 @@ export const request = async (id, handshake) => {
     method: 'post',
     url: 'http://localhost:1992/handshake',
     data: {
-      id: id,
+      requestId: id,
       handshake: handshake
     }
   })
