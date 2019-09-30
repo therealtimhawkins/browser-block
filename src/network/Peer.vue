@@ -8,6 +8,7 @@
 
 <script>
 import Peer from "simple-peer";
+import logger from "../services/logger";
 import * as axios from "axios";
 import * as uuid from "uuid/v1";
 import { get } from "lodash";
@@ -49,49 +50,6 @@ export default {
         this.message = data;
       });
     },
-    async makeHandshakeResponse(handshake) {
-      await setTimeout(async () => {
-        handshake.handshakeResponse = this.outgoing;
-        handshake.responseId = this.id;
-        await axios({
-          method: "post",
-          url: "http://localhost:1992/handshake/response",
-          data: {
-            handshake
-          }
-        });
-        console.log("Handshake requested: ", handshake);
-      }, 2000);
-      clearInterval(this.pollingHandshakes);
-    },
-    handleHandshakeResponse(myHandshake) {
-      console.log("Handling handshake: ", myHandshake);
-      this.peer.signal(JSON.parse(myHandshake.handshakeResponse));
-      this.pairedNodes.push(myHandshake.responseId);
-      clearInterval(this.pollingHandshakes);
-    },
-    async requestHandshake() {
-      await axios({
-        method: "post",
-        url: "http://localhost:1992/handshake",
-        data: {
-          id: this.id,
-          handshake: this.outgoing
-        }
-      });
-      this.handshakeRequested = true;
-    },
-    findMyHandshake(allHandshakes) {
-      let myHandshake;
-      for (let handshake of allHandshakes) {
-        const requestId = get(handshake, "handshake.requestId");
-        if (requestId && requestId === this.id) {
-          myHandshake = handshake;
-          break;
-        }
-      }
-      return myHandshake;
-    },
     pollQueuedHandshakes() {
       this.pollingHandshakes = setInterval(async () => {
         const response = await axios.get(
@@ -99,7 +57,6 @@ export default {
         );
 
         const allHandshakes = response.data;
-        console.log("allHandshakes: ", allHandshakes);
 
         if (this.handshakeRequested) {
           const myHandshake = this.findMyHandshake(allHandshakes);
@@ -111,7 +68,6 @@ export default {
           const handshake = allHandshakes.pop();
           const requestId = get(handshake, "requestId");
           if (requestId && requestId !== this.id) {
-            console.log("Recieved handshake: ", handshake);
             this.peer.signal(JSON.parse(handshake.handshake));
             this.makeHandshakeResponse(handshake);
           }
