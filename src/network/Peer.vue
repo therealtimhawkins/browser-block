@@ -2,7 +2,8 @@
   <div class="peer">
     <div>Hello Browser Coin</div>
     <div>{{message}}</div>
-    <button class="handshake" @click="requestHandshake">Join network...</button>
+    <button @click="requestHandshake">Join network...</button>
+    <button @click="sendData">Send message...</button>
   </div>
 </template>
 
@@ -59,6 +60,7 @@ export default {
       return peer;
     },
     pollQueuedHandshakes() {
+      console.log("Polling queued handshakes...");
       this.pollingHandshakes = setInterval(async () => {
         const handshake = await handshakeService.get();
         if (this.pairedNodes.length > 3) {
@@ -69,6 +71,7 @@ export default {
             !this.initiator &&
             handshake.requestId
           ) {
+            console.log("hit");
             this.peer.signal(JSON.parse(handshake.handshake));
             await setTimeout(async () => {
               handshakeService.makeResponse(handshake, this.outgoing, this.id);
@@ -78,8 +81,10 @@ export default {
       }, 2000);
     },
     pollHandshakeResponses() {
+      console.log("Polling handshake responses...");
       this.pollingResponse = setInterval(async () => {
         const handshake = await handshakeService.getResponse(this.id);
+        console.log("Handshake response: ", handshake);
         if (handshake.data.requestId) {
           this.peer.signal(JSON.parse(handshake.data.handshakeResponse));
           this.pairedNodes.push({
@@ -94,6 +99,7 @@ export default {
       }, 2000);
     },
     async requestHandshake() {
+      console.log("Requesting handshake...");
       const success = await handshakeService.request(this.id, this.outgoing);
       if (success) {
         this.handshakeRequested = true;
@@ -102,6 +108,7 @@ export default {
       }
     },
     handleData(data) {
+      console.log("Handling data...");
       switch (data.action) {
         case "success":
           if (this.pairedNodes.length < 3) {
@@ -115,11 +122,19 @@ export default {
                 peer: this.peer
               });
             }
-
-            console.log("pairedNodes: ", this.pairedNodes);
+            console.log("Paired nodes: ", this.pairedNodes);
           }
           break;
+        case "message":
+          console.log("Message from ", data.id);
+          break;
         default:
+      }
+    },
+    sendData() {
+      for (let node of this.pairedNodes) {
+        console.log("Messaging node: ", node.peerId);
+        node.peer.send(JSON.stringify({ action: "message", id: this.id }));
       }
     },
     forwardHandshake() {}

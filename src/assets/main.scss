@@ -1,0 +1,16 @@
+$blue: #588b8b;
+$orange: #f28f3b;
+$red: #c8553d;
+
+$primary: $blue;
+$link: $orange;
+$info: $red;
+$widescreen-enabled: false;
+$fullhd-enabled: false;
+
+$control-radius: 0px;
+$control-border-width: 3px;
+
+$menu-item-hover-background-color: rgba($link, 0.5);
+
+@import '~bulma/bulma';
