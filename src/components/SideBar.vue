@@ -3,7 +3,7 @@
   <aside class="section">
     <div class>Logs</div>
     <br />
-    <div v-for="(log, index) in this.logs" :key="index">
+    <div v-for="(log) in this.logs" :key="log.id">
       <div class="box" id="log-box">
         <div class="columns">
           <div class="column is-one-quarter has-text-weight-semibold">{{log.timestamp}}</div>

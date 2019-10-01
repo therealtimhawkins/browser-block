@@ -1,4 +1,5 @@
-const axios = require('axios')
+import * as axios from 'axios'
+import { logger } from '../services/logger'
 
 export const makeResponse = async (data, handshakeResponse, id) => {
   data.handshakeResponse = handshakeResponse
@@ -9,6 +10,8 @@ export const makeResponse = async (data, handshakeResponse, id) => {
     url: 'http://localhost:1992/handshake/response',
     data
   })
+
+  logger('makeResponse', response.data)
   return response
 }
 
@@ -17,6 +20,8 @@ export const getResponse = async id => {
     method: 'get',
     url: 'http://localhost:1992/handshake/response/' + id
   })
+
+  logger('getResponse', response.data.responseId)
   return response
 }
 
@@ -29,6 +34,8 @@ export const request = async (id, handshake) => {
       handshake: handshake
     }
   })
+
+  logger('requestHandshake', response.data)
   return response.status === 200
 }
 

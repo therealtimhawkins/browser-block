@@ -50,15 +50,18 @@ export default {
 
       peer.on("signal", data => {
         this.outgoing = JSON.stringify(data);
+        logger("Data", "outgoing signal " + data.type.toUpperCase());
       });
 
       peer.on("connect", () => {
-        logger("Connection", "successful");
         peer.send(JSON.stringify({ action: "success", id: this.id }));
+        logger("Connection", "successful");
       });
 
       peer.on("data", data => {
-        this.handleData(JSON.parse(new TextDecoder("utf-8").decode(data)));
+        const parsedData = JSON.parse(new TextDecoder("utf-8").decode(data));
+        logger("Data", parsedData);
+        this.handleData(parsedData);
       });
 
       return peer;
@@ -110,6 +113,7 @@ export default {
       }
     },
     handleData(data) {
+      logger("Router", "running");
       switch (data.action) {
         case "success":
           if (this.pairedNodes.length < 3) {
