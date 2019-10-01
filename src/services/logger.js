@@ -2,7 +2,7 @@ import * as moment from 'moment'
 
 export const logs = []
 
-export const log = data => {
+export const logger = message => {
   const timestamp = moment().format()
-  logs.push({ timestamp, data })
+  logs.push({ timestamp, message })
 }

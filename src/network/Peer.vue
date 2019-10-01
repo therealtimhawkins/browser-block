@@ -15,6 +15,7 @@ import Peer from "simple-peer";
 import * as uuid from "uuid/v1";
 import * as _ from "lodash";
 import * as handshakeService from "../services/handshake";
+import { logger } from "../services/logger";
 
 export default {
   name: "Peer",
@@ -33,7 +34,7 @@ export default {
   },
   created() {
     this.id = uuid();
-    console.log(this.id);
+    logger(`My ID: ${this.id}`);
     this.pollQueuedHandshakes();
     this.initialPeer();
   },
