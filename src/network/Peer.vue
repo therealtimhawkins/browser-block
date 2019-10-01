@@ -1,10 +1,13 @@
 <template>
-  <div class="peer">
-    <div>Hello Browser Coin</div>
-    <div>{{message}}</div>
-    <button @click="requestHandshake">Join network...</button>
-    <button @click="sendData">Send message...</button>
-  </div>
+  <section>
+    <div class="section">
+      <div>{{message}}</div>
+      <div class="buttons">
+        <button @click="requestHandshake" class="button">Join network...</button>
+        <button @click="sendData" class="button">Send message...</button>
+      </div>
+    </div>
+  </section>
 </template>
 
 <script>
