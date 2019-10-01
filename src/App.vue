@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <section class="columns">
-      <div class="column is-one-quarter">
+      <div class="column is-one-third">
         <SideBar />
       </div>
       <div class="column">

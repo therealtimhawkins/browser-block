@@ -34,7 +34,7 @@ export default {
   },
   created() {
     this.id = uuid();
-    logger(`My ID: ${this.id}`);
+    logger("ID", this.id);
     this.pollQueuedHandshakes();
     this.initialPeer();
   },
@@ -53,7 +53,7 @@ export default {
       });
 
       peer.on("connect", () => {
-        console.log("Connected.");
+        logger("Connection", "successful");
         peer.send(JSON.stringify({ action: "success", id: this.id }));
       });
 
@@ -64,7 +64,7 @@ export default {
       return peer;
     },
     pollQueuedHandshakes() {
-      console.log("Polling queued handshakes...");
+      logger("Polling", "queued handshakes...");
       this.pollingHandshakes = setInterval(async () => {
         const handshake = await handshakeService.get();
         if (this.pairedNodes.length > 3) {
@@ -75,7 +75,6 @@ export default {
             !this.initiator &&
             handshake.requestId
           ) {
-            console.log("hit");
             this.peer.signal(JSON.parse(handshake.handshake));
             await setTimeout(async () => {
               handshakeService.makeResponse(handshake, this.outgoing, this.id);
@@ -85,10 +84,9 @@ export default {
       }, 2000);
     },
     pollHandshakeResponses() {
-      console.log("Polling handshake responses...");
+      logger("Polling", "handshake responses...");
       this.pollingResponse = setInterval(async () => {
         const handshake = await handshakeService.getResponse(this.id);
-        console.log("Handshake response: ", handshake);
         if (handshake.data.requestId) {
           this.peer.signal(JSON.parse(handshake.data.handshakeResponse));
           this.pairedNodes.push({
@@ -103,7 +101,7 @@ export default {
       }, 2000);
     },
     async requestHandshake() {
-      console.log("Requesting handshake...");
+      logger("Request", "handshake...");
       const success = await handshakeService.request(this.id, this.outgoing);
       if (success) {
         this.handshakeRequested = true;
@@ -112,7 +110,6 @@ export default {
       }
     },
     handleData(data) {
-      console.log("Handling data...");
       switch (data.action) {
         case "success":
           if (this.pairedNodes.length < 3) {
@@ -126,18 +123,18 @@ export default {
                 peer: this.peer
               });
             }
-            console.log("Paired nodes: ", this.pairedNodes);
+            logger("Nodes", this.pairedNodes);
           }
           break;
         case "message":
-          console.log("Message from ", data.id);
+          logger("Message", "recieved from " + data.id);
           break;
         default:
       }
     },
     sendData() {
       for (let node of this.pairedNodes) {
-        console.log("Messaging node: ", node.peerId);
+        logger("Message", "sending to " + node.peerId);
         node.peer.send(JSON.stringify({ action: "message", id: this.id }));
       }
     },

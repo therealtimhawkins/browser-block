@@ -2,7 +2,7 @@ import * as moment from 'moment'
 
 export const logs = []
 
-export const logger = message => {
-  const timestamp = moment().format()
-  logs.push({ timestamp, message })
+export const logger = (title, message) => {
+  const timestamp = moment().format('hh:mm:ss.SSS')
+  logs.push({ timestamp, title, message })
 }
