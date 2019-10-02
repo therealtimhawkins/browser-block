@@ -2,6 +2,7 @@
   <section>
     <div class="buttons">
       <button @click="requestConnection" class="button">Join network</button>
+      <button @click="sendData" class="button">Send message</button>
     </div>
   </section>
 </template>
@@ -18,9 +19,8 @@ export default {
     this.id = uuidv1();
     this.peer = new Peer(this.id);
 
-    this.peer.on("connection", conn => {
-      conn.on("data", data => {
-        // Will print 'hi!'
+    this.peer.on("connection", connection => {
+      connection.on("data", data => {
         console.log(data);
       });
     });
@@ -31,7 +31,8 @@ export default {
     return {
       id: null,
       peer: null,
-      pollingQueue: null
+      pollingQueue: null,
+      pairedNodes: []
     };
   },
   methods: {
@@ -53,9 +54,15 @@ export default {
       }
     },
     connectToPeer(id) {
-      const conn = this.peer.connect(id);
-      conn.on("open", () => {
-        conn.send("hi!");
+      const node = this.peer.connect(id);
+      this.pairedNodes.push({ id, node });
+      node.on("open", () => {
+        node.send("hi!");
+      });
+    },
+    sendData() {
+      this.pairedNodes.forEach(nodeObject => {
+        nodeObject.node.send("TESTING");
       });
     }
   }
