@@ -5,7 +5,7 @@
     <br />
     <div class>Logs</div>
     <br />
-    <div v-for="(log) in this.logs" :key="log.id">
+    <div v-for="(log) in this.logs.slice().reverse()" :key="log.id">
       <div class="box is-scrollable" id="log-box">
         <div class="columns">
           <div
