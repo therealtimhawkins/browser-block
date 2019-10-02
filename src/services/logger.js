@@ -1,5 +1,4 @@
 import * as moment from 'moment'
-const { deepParseJson } = require('deep-parse-json')
 
 export const logs = []
 
@@ -10,6 +9,6 @@ export const logger = (title, message, data) => {
     timestamp,
     title,
     message,
-    data: deepParseJson(data)
+    data
   })
 }

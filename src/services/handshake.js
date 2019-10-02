@@ -11,6 +11,7 @@ export const makeResponse = async (data, handshakeResponse, id) => {
     data
   })
 
+  logger('makeResponse', '', response.data)
   return response
 }
 
@@ -20,21 +21,20 @@ export const getResponse = async id => {
     url: 'http://localhost:1992/handshake/response/' + id
   })
 
-  logger('getResponse', 'data', response.data)
+  logger('getResponse', '', response.data)
   return response
 }
 
-export const request = async (id, handshake) => {
+export const request = async id => {
   const response = await axios({
     method: 'post',
     url: 'http://localhost:1992/handshake',
     data: {
-      requestId: id,
-      handshake: handshake
+      requestId: id
     }
   })
 
-  logger('requestHandshake', response.data)
+  logger('requestHandshake', '', response.data)
   return response.status === 200
 }
 

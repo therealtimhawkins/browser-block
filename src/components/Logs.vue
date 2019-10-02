@@ -3,7 +3,7 @@
   <aside class="section">
     <Peer />
     <br />
-    <div class>Logs</div>
+    <div>Logs</div>
     <br />
     <div v-for="(log) in this.logs.slice().reverse()" :key="log.id">
       <div class="box is-scrollable" id="log-box">
@@ -18,7 +18,7 @@
               v-bind:class="getColour(log.title)"
             >{{log.title}}</span>
             <span>: {{log.message}}</span>
-            <VueJsonPretty id="json" v-if="log.data" :path="'res'" :data="log.data"></VueJsonPretty>
+            <VueJsonPretty id="json" v-if="log.data" :path="'res'" :data="deepParseJson(log.data)"></VueJsonPretty>
           </div>
         </div>
       </div>
@@ -30,12 +30,14 @@
 import Peer from "../network/Peer";
 import { logs } from "../services/logger";
 import VueJsonPretty from "vue-json-pretty";
+const { deepParseJson } = require("deep-parse-json");
 
 export default {
-  name: "SideBar",
+  name: "Logs",
   data: function() {
     return {
-      logs
+      logs,
+      deepParseJson
     };
   },
   components: {
@@ -60,7 +62,7 @@ export default {
 <style scoped>
 #log-box {
   margin-bottom: 8px;
-  padding: 8px 0 0 8px;
+  padding: 12px 0 0 12px;
 }
 
 .columns:first-child {

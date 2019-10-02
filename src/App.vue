@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <SideBar />
+    <Logs />
   </div>
 </template>
 
 <script>
-import SideBar from "./components/SideBar.vue";
+import Logs from "./components/Logs.vue";
 
 export default {
   name: "app",
   components: {
-    SideBar
+    Logs
   }
 };
 </script>
