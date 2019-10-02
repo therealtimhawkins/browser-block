@@ -11,7 +11,6 @@ export const makeResponse = async (data, handshakeResponse, id) => {
     data
   })
 
-  logger('makeResponse', response.data)
   return response
 }
 
@@ -21,7 +20,7 @@ export const getResponse = async id => {
     url: 'http://localhost:1992/handshake/response/' + id
   })
 
-  logger('getResponse', response.data.responseId)
+  logger('getResponse', 'data', response.data)
   return response
 }
 

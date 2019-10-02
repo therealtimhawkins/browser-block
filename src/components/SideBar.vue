@@ -1,15 +1,24 @@
 
 <template>
   <aside class="section">
+    <Peer />
+    <br />
     <div class>Logs</div>
     <br />
     <div v-for="(log) in this.logs" :key="log.id">
-      <div class="box" id="log-box">
+      <div class="box is-scrollable" id="log-box">
         <div class="columns">
-          <div class="column is-one-quarter has-text-weight-semibold">{{log.timestamp}}</div>
+          <div
+            class="column is-one-quarter has-text-weight-semibold has-text-primary"
+            v-bind:class="getColour(log.title)"
+          >{{log.timestamp}}</div>
           <div class="column">
-            <span class="has-text-weight-semibold">{{log.title}} -</span>
-            {{log.message}}
+            <span
+              class="has-text-weight-semibold has-text-link"
+              v-bind:class="getColour(log.title)"
+            >{{log.title}}</span>
+            <span>: {{log.message}}</span>
+            <VueJsonPretty id="json" v-if="log.data" :path="'res'" :data="log.data"></VueJsonPretty>
           </div>
         </div>
       </div>
@@ -18,22 +27,47 @@
 </template>
 
 <script>
+import Peer from "../network/Peer";
 import { logs } from "../services/logger";
+import VueJsonPretty from "vue-json-pretty";
 
 export default {
   name: "SideBar",
   data: function() {
     return {
-      logs: logs
+      logs
     };
   },
-  components: {},
-  methods: {}
+  components: {
+    Peer,
+    VueJsonPretty
+  },
+  methods: {
+    getColour(title) {
+      switch (title) {
+        case "Error":
+          return "has-text-danger";
+        case "Connection":
+          return "has-text-success";
+        default:
+          return null;
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
 #log-box {
   margin-bottom: 8px;
+  padding: 8px 0 0 8px;
+}
+
+.columns:first-child {
+  margin-bottom: 0;
+}
+
+#json {
+  width: 90%;
 }
 </style>
