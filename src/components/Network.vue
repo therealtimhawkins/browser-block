@@ -40,12 +40,17 @@ export default {
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
     const pairedNodes = this.$store.getters.pairedNodes;
     const id = this.$store.getters.id;
-    console.log(id);
+    let group = 1;
 
     const graph = {
-      nodes: [{ id: id, group: 1 }],
+      nodes: [{ id, group }],
       links: []
     };
+
+    pairedNodes.forEach(node => {
+      group += 1;
+      graph.nodes.push({ id: node.id, group });
+    });
 
     // const graph = {
     //   nodes: [
