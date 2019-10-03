@@ -58,12 +58,10 @@ export default {
     },
     connectToPeer(id, reply = false) {
       const noOfPairedNodes = this.$store.getters.pairedNodes.length;
-      logger("Paired Node", "", this.$store.getters.pairedNodes.length);
       if (noOfPairedNodes < 3) {
         const node = this.peer.connect(id);
         this.$store.commit("updatePairedNodes", { id, node });
-
-        logger("Nodes", "paired", noOfPairedNodes);
+        logger("Paired Nodes", "", this.$store.getters.pairedNodes.length);
         if (!reply) {
           node.on("open", () => {
             node.send(
