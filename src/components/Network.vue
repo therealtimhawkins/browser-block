@@ -38,17 +38,26 @@ export default {
           .distanceMax(150)
       )
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
+    const pairedNodes = this.$store.getters.pairedNodes;
+    const id = this.$store.getters.id;
+    console.log(id);
+
     const graph = {
-      nodes: [
-        { id: "1", group: 1 },
-        { id: "2", group: 2 },
-        { id: "4", group: 3 }
-      ],
-      links: [
-        { source: "1", target: "2", value: 1 },
-        { source: "1", target: "4", value: 1 }
-      ]
+      nodes: [{ id: id, group: 1 }],
+      links: []
     };
+
+    // const graph = {
+    //   nodes: [
+    //     { id: id, group: 1 },
+    //     { id: "2", group: 2 },
+    //     { id: "4", group: 3 }
+    //   ],
+    //   links: [
+    //     { source: id, target: "2", value: 1 },
+    //     { source: id, target: "4", value: 1 }
+    //   ]
+    // };
 
     function run(graph) {
       var link = svg

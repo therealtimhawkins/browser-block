@@ -17,6 +17,7 @@ export default {
   name: "Peer",
   created() {
     this.id = uuidv1();
+    this.$store.commit("addId", this.id);
     logger("ID", "", this.id);
     this.peer = new Peer(this.id);
 
