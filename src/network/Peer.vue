@@ -17,11 +17,13 @@ export default {
   name: "Peer",
   created() {
     this.id = uuidv1();
+    logger("ID", "", this.id);
     this.peer = new Peer(this.id);
 
     this.peer.on("connection", connection => {
       connection.on("data", data => {
-        console.log(data);
+        logger("Data", "recieved", data);
+        this.dataRouter(JSON.parse(data));
       });
     });
 
@@ -49,21 +51,46 @@ export default {
     async requestConnection() {
       logger("Connection", "request...");
       const success = await Connection.request(this.id);
+      logger("Connection", `with ${this.id}`, { status: success });
       if (success) {
         clearInterval(this.pollingQueue);
       }
     },
-    connectToPeer(id) {
-      const node = this.peer.connect(id);
-      this.pairedNodes.push({ id, node });
-      node.on("open", () => {
-        node.send("hi!");
-      });
+    connectToPeer(id, replyMode = false) {
+      if (this.pairedNodes.length < 3) {
+        const node = this.peer.connect(id);
+        this.pairedNodes.push({ id, node });
+        logger("Nodes", "paired", this.pairedNodes.length);
+        if (!replyMode) {
+          node.on("open", () => {
+            node.send(
+              JSON.stringify({
+                action: "PAIR",
+                id: this.id
+              })
+            );
+          });
+        }
+      }
+      if (this.pairedNodes.length >= 3) {
+        clearInterval(this.pollingQueue);
+      }
     },
     sendData() {
       this.pairedNodes.forEach(nodeObject => {
-        nodeObject.node.send("TESTING");
+        nodeObject.node.send("Message from " + this.id);
       });
+    },
+    dataRouter(data) {
+      logger("Data", "router action", data);
+      switch (data.action) {
+        case "PAIR":
+          logger("Connection", "pairing", data.id);
+          this.connectToPeer(data.id, true);
+          break;
+        default:
+          break;
+      }
     }
   }
 };
