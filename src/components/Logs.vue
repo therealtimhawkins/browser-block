@@ -1,4 +1,3 @@
-
 <template>
   <aside class="section">
     <Peer />
@@ -27,7 +26,7 @@
 </template>
 
 <script>
-import Peer from "../network/Peer";
+import Peer from "./Peer";
 import { logs } from "../services/logger";
 import VueJsonPretty from "vue-json-pretty";
 const { deepParseJson } = require("deep-parse-json");

@@ -1,16 +1,40 @@
 <template>
-  <div id="app">
-    <Logs />
-  </div>
+  <section id="app" class="section">
+    <div class="buttons">
+      <button @click="selectView('logs')" class="button">Logs</button>
+      <button @click="selectView('network')" class="button">Network</button>
+    </div>
+    <Network v-if="this.network" />
+    <Logs v-if="this.logs" />
+  </section>
 </template>
 
 <script>
 import Logs from "./components/Logs.vue";
+import Network from "./components/Network";
 
 export default {
   name: "app",
   components: {
-    Logs
+    Logs,
+    Network
+  },
+  data() {
+    return {
+      network: false,
+      logs: true
+    };
+  },
+  methods: {
+    selectView(view) {
+      if (view === "logs") {
+        this.logs = true;
+        this.network = false;
+      } else {
+        this.logs = false;
+        this.network = true;
+      }
+    }
   }
 };
 </script>

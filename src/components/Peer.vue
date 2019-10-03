@@ -56,12 +56,15 @@ export default {
         clearInterval(this.pollingQueue);
       }
     },
-    connectToPeer(id, replyMode = false) {
-      if (this.pairedNodes.length < 3) {
+    connectToPeer(id, reply = false) {
+      const noOfPairedNodes = this.$store.getters.pairedNodes.length;
+      logger("Paired Node", "", this.$store.getters.pairedNodes.length);
+      if (noOfPairedNodes < 3) {
         const node = this.peer.connect(id);
-        this.pairedNodes.push({ id, node });
-        logger("Nodes", "paired", this.pairedNodes.length);
-        if (!replyMode) {
+        this.$store.commit("updatePairedNodes", { id, node });
+
+        logger("Nodes", "paired", noOfPairedNodes);
+        if (!reply) {
           node.on("open", () => {
             node.send(
               JSON.stringify({
@@ -77,12 +80,12 @@ export default {
       }
     },
     sendData() {
-      this.pairedNodes.forEach(nodeObject => {
+      this.$store.getters.pairedNodes.forEach(nodeObject => {
         nodeObject.node.send("Message from " + this.id);
       });
     },
     dataRouter(data) {
-      logger("Data", "router action", data);
+      logger("Data", "router action", data.action);
       switch (data.action) {
         case "PAIR":
           logger("Connection", "pairing", data.id);
