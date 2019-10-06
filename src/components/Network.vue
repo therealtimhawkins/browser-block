@@ -9,7 +9,9 @@ export default {
   data: function() {
     return {
       width: 200,
-      height: 200
+      height: 200,
+      svg: null,
+      simulation: null
     };
   },
   created() {
@@ -20,8 +22,8 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   mounted() {
-    const svg = d3.select("svg");
-    const simulation = d3
+    this.svg = d3.select("svg");
+    this.simulation = d3
       .forceSimulation()
       .force(
         "link",
@@ -38,41 +40,55 @@ export default {
           .distanceMax(150)
       )
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
-    const pairedNodes = this.$store.getters.pairedNodes;
-    const id = this.$store.getters.id;
-    let group = 1;
 
-    const graph = {
-      nodes: [{ id, group }],
-      links: []
-    };
+    this.run(this.createGraph());
+  },
+  methods: {
+    handleResize() {
+      this.width = window.innerWidth - 48;
+      this.height = window.innerHeight * 0.8;
+    },
+    dragstarted(d) {
+      if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    },
+    dragged(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+    },
+    dragended(d) {
+      d.fx = d3.event.x;
+      d.fy = d3.event.y;
+      if (!d3.event.active) this.simulation.alphaTarget(0);
+    },
+    createGraph() {
+      const pairedNodes = this.$store.getters.pairedNodes;
+      const id = this.$store.getters.id;
+      let group = 1;
 
-    pairedNodes.forEach(node => {
-      group += 1;
-      graph.nodes.push({ id: node.id, group });
-    });
+      const graph = {
+        nodes: [{ id, group }],
+        links: []
+      };
 
-    // const graph = {
-    //   nodes: [
-    //     { id: id, group: 1 },
-    //     { id: "2", group: 2 },
-    //     { id: "4", group: 3 }
-    //   ],
-    //   links: [
-    //     { source: id, target: "2", value: 1 },
-    //     { source: id, target: "4", value: 1 }
-    //   ]
-    // };
+      pairedNodes.forEach(node => {
+        group += 1;
+        graph.nodes.push({ id: node.id, group });
+        graph.links.push({ source: id, target: node.id, value: 1 });
+      });
 
-    function run(graph) {
-      var link = svg
+      return graph;
+    },
+    run(graph) {
+      const link = this.svg
         .append("g")
         .style("stroke", "#aaa")
         .selectAll("line")
         .data(graph.links)
         .enter()
         .append("line");
-      var node = svg
+      const node = this.svg
         .append("g")
         .attr("class", "nodes")
         .selectAll("circle")
@@ -83,12 +99,12 @@ export default {
         .call(
           d3
             .drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
+            .on("start", this.dragstarted)
+            .on("drag", this.dragged)
+            .on("end", this.dragended)
         );
 
-      var label = svg
+      const label = this.svg
         .append("g")
         .attr("class", "labels")
         .selectAll("text")
@@ -99,8 +115,8 @@ export default {
         .text(function(d) {
           return d.id;
         });
-      simulation.nodes(graph.nodes).on("tick", ticked);
-      simulation.force("link").links(graph.links);
+      this.simulation.nodes(graph.nodes).on("tick", ticked);
+      this.simulation.force("link").links(graph.links);
       function ticked() {
         link
           .attr("x1", function(d) {
@@ -137,28 +153,6 @@ export default {
           .style("font-size", "10px")
           .style("fill", "#333");
       }
-    }
-    function dragstarted(d) {
-      if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
-    function dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    }
-    function dragended(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-      if (!d3.event.active) simulation.alphaTarget(0);
-    }
-
-    run(graph);
-  },
-  methods: {
-    handleResize() {
-      this.width = window.innerWidth - 48;
-      this.height = window.innerHeight * 0.8;
     }
   }
 };

@@ -14,8 +14,10 @@ export const request = async id => {
   return response.status === 200
 }
 
-export const get = async () => {
-  const response = await axios.get('http://localhost:1992/handshake/queued')
+export const get = async id => {
+  const response = await axios.get(
+    'http://localhost:1992/handshake/queued/' + id
+  )
   const allHandshakes = response.data
   return allHandshakes
 }

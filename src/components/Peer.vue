@@ -3,6 +3,7 @@
     <div class="buttons">
       <button @click="requestConnection" class="button">Join network</button>
       <button @click="sendData" class="button">Send message</button>
+      <div v-if="this.pollingQueue" class="button is-success">POLLING</div>
     </div>
   </section>
 </template>
@@ -42,7 +43,7 @@ export default {
     pollQueue() {
       logger("Polling", "queue");
       this.pollingQueue = setInterval(async () => {
-        const connRequest = await Connection.get();
+        const connRequest = await Connection.get(this.id);
         if (connRequest.requestId) {
           logger("Connection", "ID", connRequest);
           this.connectToPeer(connRequest.requestId);
@@ -55,6 +56,7 @@ export default {
       logger("Connection", `with ${this.id}`, { status: success });
       if (success) {
         clearInterval(this.pollingQueue);
+        this.pollingQueue = false;
       }
     },
     connectToPeer(id, reply = false) {
@@ -73,9 +75,12 @@ export default {
             );
           });
         }
+        this.pollQueue();
       }
-      if (this.pairedNodes.length >= 3) {
+      if (this.$store.getters.pairedNodes.length === 3) {
+        logger("Paired Nodes", "MAX", 3);
         clearInterval(this.pollingQueue);
+        this.pollingQueue = false;
       }
     },
     sendData() {
