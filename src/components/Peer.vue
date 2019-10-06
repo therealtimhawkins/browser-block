@@ -93,7 +93,8 @@ export default {
       logger("Data", "router action", data.action);
       switch (data.action) {
         case "PAIR":
-          logger("Connection", "pairing", data.pairedNodesIds);
+          logger("Connection", "pairing", data);
+          this.$store.commit("updateNodeBlackList", data.pairedNodeIds);
           this.connectToPeer(data.id, true);
           break;
         default:
