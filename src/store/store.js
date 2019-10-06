@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
     id: '',
-    pairedNodes: []
+    pairedNodes: [],
+    pairedNodeIds: []
   },
   mutations: {
     addId(state, id) {
@@ -14,10 +15,12 @@ export const store = new Vuex.Store({
     },
     updatePairedNodes(state, node) {
       state.pairedNodes.push(node)
+      state.pairedNodeIds.push(node.id)
     }
   },
   getters: {
     id: state => state.id,
-    pairedNodes: state => state.pairedNodes
+    pairedNodes: state => state.pairedNodes,
+    pairedNodeIds: state => state.pairedNodeIds
   }
 })

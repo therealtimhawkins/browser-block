@@ -70,7 +70,8 @@ export default {
             node.send(
               JSON.stringify({
                 action: "PAIR",
-                id: this.id
+                id: this.id,
+                pairedNodeIds: this.$store.getters.pairedNodeIds
               })
             );
           });
@@ -92,7 +93,7 @@ export default {
       logger("Data", "router action", data.action);
       switch (data.action) {
         case "PAIR":
-          logger("Connection", "pairing", data.id);
+          logger("Connection", "pairing", data.pairedNodesIds);
           this.connectToPeer(data.id, true);
           break;
         default:
