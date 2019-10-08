@@ -15,13 +15,15 @@ export const store = new Vuex.Store({
       state.id = id
     },
     updatePairedNodes(state, node) {
-      state.pairedNodes.push(node)
-      state.pairedNodeIds.push(node.id)
+      if (state.id !== node.id) {
+        state.pairedNodes.push(node)
+        state.pairedNodeIds.push(node.id)
+      }
     },
-    updateNodeBlackList(state, ids) {
-      ids.forEach(id => {
-        if (state.nodeBlackList.indexOf(id) === -1) {
-          state.nodeBlackList.push(id)
+    updateNodeBlackList(state, data) {
+      data.ids.forEach(id => {
+        if (state.nodeBlackList.indexOf(id) === -1 && state.id !== id) {
+          state.nodeBlackList.push({ parentId: data.parentId, id })
         }
       })
     }

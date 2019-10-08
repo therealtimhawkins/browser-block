@@ -64,18 +64,25 @@ export default {
     },
     createGraph() {
       const pairedNodes = this.$store.getters.pairedNodes;
+      const nodeBlackList = this.$store.getters.nodeBlackList;
       const id = this.$store.getters.id;
       let group = 1;
 
       const graph = {
-        nodes: [{ id, group }],
+        nodes: [{ id, group, type: "me" }],
         links: []
       };
 
       pairedNodes.forEach(node => {
         group += 1;
-        graph.nodes.push({ id: node.id, group });
+        graph.nodes.push({ id: node.id, group, type: "pair" });
         graph.links.push({ source: id, target: node.id, value: 1 });
+      });
+
+      nodeBlackList.forEach(node => {
+        group += 1;
+        graph.nodes.push({ id: node.id, group, type: "pairNode" });
+        graph.links.push({ source: node.parentId, target: node.id, value: 1 });
       });
 
       return graph;
@@ -133,13 +140,24 @@ export default {
           });
         node
           .attr("r", 16)
-          .style("fill", "#efefef")
+          .style("fill", d => {
+            switch (d.type) {
+              case "me":
+                return "#B6D094";
+              case "pair":
+                return "#E1AA7D";
+              case "pairNode":
+                return "#F0E68C";
+              default:
+                return "#DCDCDC";
+            }
+          })
           .style("stroke", "#424242")
           .style("stroke-width", "1px")
-          .attr("cx", function(d) {
+          .attr("cx", d => {
             return d.x + 5;
           })
-          .attr("cy", function(d) {
+          .attr("cy", d => {
             return d.y - 3;
           });
 

@@ -40,11 +40,16 @@ export default {
     };
   },
   methods: {
+    nodeBlackListed(id) {
+      const blackListed = this.$store.getters.nodeBlackList.indexOf(id) !== -1;
+      return blackListed;
+    },
     pollQueue() {
       logger("Polling", "queue");
       this.pollingQueue = setInterval(async () => {
         const connRequest = await Connection.get(this.id);
-        if (connRequest.requestId) {
+        const blackListed = this.nodeBlackListed(connRequest.requestId);
+        if (connRequest.requestId && !blackListed) {
           logger("Connection", "ID", connRequest);
           this.connectToPeer(connRequest.requestId);
         }
@@ -94,7 +99,11 @@ export default {
       switch (data.action) {
         case "PAIR":
           logger("Connection", "pairing", data);
-          this.$store.commit("updateNodeBlackList", data.pairedNodeIds);
+          this.$store.commit("updateNodeBlackList", {
+            ids: data.pairedNodeIds,
+            parentId: data.id
+          });
+          // update network
           this.connectToPeer(data.id, true);
           break;
         default:
