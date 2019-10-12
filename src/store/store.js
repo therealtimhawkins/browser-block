@@ -8,7 +8,8 @@ export const store = new Vuex.Store({
     id: '',
     pairedNodes: [],
     pairedNodeIds: [],
-    nodeBlackList: []
+    nodeBlackList: [],
+    nodeBlackListIds: []
   },
   mutations: {
     addId(state, id) {
@@ -24,6 +25,7 @@ export const store = new Vuex.Store({
       data.ids.forEach(id => {
         if (state.nodeBlackList.indexOf(id) === -1 && state.id !== id) {
           state.nodeBlackList.push({ parentId: data.parentId, id })
+          state.nodeBlackListIds.push(id)
         }
       })
     }
@@ -32,6 +34,7 @@ export const store = new Vuex.Store({
     id: state => state.id,
     pairedNodes: state => state.pairedNodes,
     pairedNodeIds: state => state.pairedNodeIds,
-    nodeBlackList: state => state.nodeBlackList
+    nodeBlackList: state => state.nodeBlackList,
+    nodeBlackListIds: state => state.nodeBlackListIds
   }
 })

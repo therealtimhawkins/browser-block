@@ -30,7 +30,7 @@ export default {
       this.updatePairedNodes();
     },
     nodeBlackList() {
-      this.updateNodeBlackList();
+      this.updateBlackListedNodes();
     }
   },
   mounted() {
@@ -66,7 +66,7 @@ export default {
     },
     updateBlackListedNodes() {
       this.$store.getters.nodeBlackList.forEach(node => {
-        this.node.push({
+        this.nodes.push({
           id: node.id,
           _color: "yellow"
         });

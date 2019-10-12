@@ -11,6 +11,7 @@
 <script>
 import Peer from "peerjs";
 import * as uuidv1 from "uuid/v1";
+import * as _ from "lodash";
 import { logger } from "../services/logger";
 import * as Connection from "../services/handshake";
 
@@ -61,10 +62,9 @@ export default {
           connRequest.requestId &&
           this.$store.getters.pairedNodes.length === this.maxNodes
         ) {
-          logger("Transfer HIT...");
           this.sendData({
             action: "TRANSFER_PAIR",
-            data: {
+            body: {
               request: connRequest
             }
           });
@@ -124,6 +124,14 @@ export default {
           break;
         case "TRANSFER_PAIR":
           logger("Transfer data", data.body);
+          if (
+            !_.includes(
+              this.$store.getters.pairedNodesIds,
+              data.body.request.requestId
+            )
+          ) {
+            this.connectToPeer(data.body.request.requestId);
+          }
           break;
         default:
           break;
