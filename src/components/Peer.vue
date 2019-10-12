@@ -1,7 +1,7 @@
 <template>
   <section>
     <div class="buttons">
-      <button @click="requestConnection" class="button">Join network</button>
+      <button @click="requestConnection" class="button" id="join-network">Join network</button>
       <button @click="sendData" class="button">Send message</button>
       <div v-if="this.pollingQueue" class="button is-success">POLLING</div>
     </div>
@@ -16,28 +16,29 @@ import * as Connection from "../services/handshake";
 
 export default {
   name: "Peer",
+  data: () => {
+    return {
+      id: null,
+      peer: null,
+      pollingQueue: null,
+      pairedNodes: [],
+      maxNodes: 2
+    };
+  },
   created() {
     this.id = uuidv1();
     this.$store.commit("addId", this.id);
-    logger("ID", "", this.id);
+    logger("ID", this.id);
     this.peer = new Peer(this.id);
 
     this.peer.on("connection", connection => {
       connection.on("data", data => {
-        logger("Data", "recieved", data);
+        logger("Data recieved", data);
         this.dataRouter(JSON.parse(data));
       });
     });
 
     this.pollQueue();
-  },
-  data: function() {
-    return {
-      id: null,
-      peer: null,
-      pollingQueue: null,
-      pairedNodes: []
-    };
   },
   methods: {
     nodeBlackListed(id) {
@@ -45,66 +46,84 @@ export default {
       return blackListed;
     },
     pollQueue() {
-      logger("Polling", "queue");
+      logger("Polling queue...");
       this.pollingQueue = setInterval(async () => {
         const connRequest = await Connection.get(this.id);
         const blackListed = this.nodeBlackListed(connRequest.requestId);
-        if (connRequest.requestId && !blackListed) {
-          logger("Connection", "ID", connRequest);
+        if (
+          connRequest.requestId &&
+          !blackListed &&
+          this.$store.getters.pairedNodes.length < this.maxNodes
+        ) {
+          logger("Connection ID", connRequest);
           this.connectToPeer(connRequest.requestId);
+        } else if (
+          connRequest.requestId &&
+          this.$store.getters.pairedNodes.length === this.maxNodes
+        ) {
+          logger("Transfer HIT...");
+          this.sendData({
+            action: "TRANSFER_PAIR",
+            data: {
+              request: connRequest
+            }
+          });
         }
       }, 2000);
     },
     async requestConnection() {
-      logger("Connection", "request...");
       const success = await Connection.request(this.id);
-      logger("Connection", `with ${this.id}`, { status: success });
+      logger(`Connection with ${this.id}`, { status: success });
       if (success) {
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
       }
     },
     connectToPeer(id, reply = false) {
+      logger("Connection ");
       const noOfPairedNodes = this.$store.getters.pairedNodes.length;
-      if (noOfPairedNodes < 3) {
+      if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         this.$store.commit("updatePairedNodes", { id, node });
-        logger("Paired Nodes", "", this.$store.getters.pairedNodes.length);
+        logger("Paired nodes", this.$store.getters.pairedNodes.length);
         if (!reply) {
           node.on("open", () => {
             node.send(
               JSON.stringify({
                 action: "PAIR",
                 id: this.id,
-                pairedNodeIds: this.$store.getters.pairedNodeIds
+                body: {
+                  pairedNodeIds: this.$store.getters.pairedNodeIds
+                }
               })
             );
           });
         }
         this.pollQueue();
       }
-      if (this.$store.getters.pairedNodes.length === 3) {
-        logger("Paired Nodes", "MAX", 3);
+      if (this.$store.getters.pairedNodes.length === this.maxNodes) {
+        logger("Reached node max", this.maxNodes);
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
       }
     },
-    sendData() {
+    sendData(data) {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
-        nodeObject.node.send("Message from " + this.id);
+        nodeObject.node.send(JSON.stringify(data));
       });
     },
     dataRouter(data) {
-      logger("Data", "router action", data.action);
+      logger("Router action", data.action);
       switch (data.action) {
         case "PAIR":
-          logger("Connection", "pairing", data);
           this.$store.commit("updateNodeBlackList", {
-            ids: data.pairedNodeIds,
+            ids: data.body.pairedNodeIds,
             parentId: data.id
           });
-          // update network
           this.connectToPeer(data.id, true);
+          break;
+        case "TRANSFER_PAIR":
+          logger("Transfer data", data.body);
           break;
         default:
           break;

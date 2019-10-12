@@ -2,7 +2,7 @@
   <section id="app" class="section">
     <div class="buttons">
       <button @click="selectView('logs')" class="button">Logs</button>
-      <button @click="selectView('network')" class="button">Network</button>
+      <button @click="selectView('network')" class="button" id="network-button">Network</button>
     </div>
     <Network v-if="this.network" />
     <Logs v-if="this.logs" />

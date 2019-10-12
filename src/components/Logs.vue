@@ -16,7 +16,6 @@
               class="has-text-weight-semibold has-text-link"
               v-bind:class="getColour(log.title)"
             >{{log.title}}</span>
-            <span>: {{log.message}}</span>
             <VueJsonPretty id="json" v-if="log.data" :path="'res'" :data="deepParseJson(log.data)"></VueJsonPretty>
           </div>
         </div>

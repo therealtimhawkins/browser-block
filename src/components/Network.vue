@@ -1,177 +1,62 @@
 <template>
-  <svg :style="{width, height}" />
+  <d3-network :net-nodes="nodes" :net-links="links" :options="options" />
 </template>
 
 <script>
-import * as d3 from "d3";
+import D3Network from "vue-d3-network";
+import { mapState } from "vuex";
+
 export default {
   name: "Network",
-  data: function() {
-    return {
-      width: 200,
-      height: 200,
-      svg: null,
-      simulation: null
-    };
+  components: {
+    D3Network
   },
-  created() {
-    window.addEventListener("resize", this.handleResize);
-    this.handleResize();
-  },
-  destroyed() {
-    window.removeEventListener("resize", this.handleResize);
+  computed() {
+    mapState(["pairedNodes"]);
   },
   mounted() {
-    this.svg = d3.select("svg");
-    this.simulation = d3
-      .forceSimulation()
-      .force(
-        "link",
-        d3.forceLink().id(function(d) {
-          return d.id;
-        })
-      )
-      .force(
-        "charge",
-        d3
-          .forceManyBody()
-          .strength(-200)
-          .theta(0.8)
-          .distanceMax(150)
-      )
-      .force("center", d3.forceCenter(this.width / 2, this.height / 2));
+    this.nodes.push({
+      id: this.$store.getters.id,
+      _color: "palegreen"
+    });
 
-    this.run(this.createGraph());
+    this.$store.getters.pairedNodes.forEach(node => {
+      this.nodes.push({
+        id: node.id,
+        _color: "coral"
+      });
+
+      this.links.push({
+        sid: this.$store.getters.id,
+        tid: node.id,
+        _color: "gray"
+      });
+    });
+
+    this.$store.getters.nodeBlackList.forEach(node => {
+      this.node.push({
+        id: node.id,
+        _color: "yellow"
+      });
+
+      this.links.push({
+        sid: node.parentId,
+        tid: node.id,
+        _color: "gray"
+      });
+    });
   },
-  methods: {
-    handleResize() {
-      this.width = window.innerWidth - 48;
-      this.height = window.innerHeight * 0.8;
-    },
-    dragstarted(d) {
-      if (!d3.event.active) this.simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    },
-    dragged(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-    },
-    dragended(d) {
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
-      if (!d3.event.active) this.simulation.alphaTarget(0);
-    },
-    createGraph() {
-      const pairedNodes = this.$store.getters.pairedNodes;
-      const nodeBlackList = this.$store.getters.nodeBlackList;
-      const id = this.$store.getters.id;
-      let group = 1;
-
-      const graph = {
-        nodes: [{ id, group, type: "me" }],
-        links: []
-      };
-
-      pairedNodes.forEach(node => {
-        group += 1;
-        graph.nodes.push({ id: node.id, group, type: "pair" });
-        graph.links.push({ source: id, target: node.id, value: 1 });
-      });
-
-      nodeBlackList.forEach(node => {
-        group += 1;
-        graph.nodes.push({ id: node.id, group, type: "pairNode" });
-        graph.links.push({ source: node.parentId, target: node.id, value: 1 });
-      });
-
-      return graph;
-    },
-    run(graph) {
-      const link = this.svg
-        .append("g")
-        .style("stroke", "#aaa")
-        .selectAll("line")
-        .data(graph.links)
-        .enter()
-        .append("line");
-      const node = this.svg
-        .append("g")
-        .attr("class", "nodes")
-        .selectAll("circle")
-        .data(graph.nodes)
-        .enter()
-        .append("circle")
-        .attr("r", 2)
-        .call(
-          d3
-            .drag()
-            .on("start", this.dragstarted)
-            .on("drag", this.dragged)
-            .on("end", this.dragended)
-        );
-
-      const label = this.svg
-        .append("g")
-        .attr("class", "labels")
-        .selectAll("text")
-        .data(graph.nodes)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .text(function(d) {
-          return d.id;
-        });
-      this.simulation.nodes(graph.nodes).on("tick", ticked);
-      this.simulation.force("link").links(graph.links);
-      function ticked() {
-        link
-          .attr("x1", function(d) {
-            return d.source.x;
-          })
-          .attr("y1", function(d) {
-            return d.source.y;
-          })
-          .attr("x2", function(d) {
-            return d.target.x;
-          })
-          .attr("y2", function(d) {
-            return d.target.y;
-          });
-        node
-          .attr("r", 16)
-          .style("fill", d => {
-            switch (d.type) {
-              case "me":
-                return "#B6D094";
-              case "pair":
-                return "#E1AA7D";
-              case "pairNode":
-                return "#F0E68C";
-              default:
-                return "#DCDCDC";
-            }
-          })
-          .style("stroke", "#424242")
-          .style("stroke-width", "1px")
-          .attr("cx", d => {
-            return d.x + 5;
-          })
-          .attr("cy", d => {
-            return d.y - 3;
-          });
-
-        label
-          .attr("x", function(d) {
-            return d.x;
-          })
-          .attr("y", function(d) {
-            return d.y;
-          })
-          .style("font-size", "10px")
-          .style("fill", "#333");
+  data() {
+    return {
+      nodes: [],
+      links: [],
+      options: {
+        force: 3000,
+        nodeSize: 20,
+        nodeLabels: true,
+        linkWidth: 1
       }
-    }
+    };
   }
 };
 </script>
