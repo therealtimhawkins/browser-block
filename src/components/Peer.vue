@@ -101,11 +101,22 @@ export default {
         }
         this.pollQueue();
       }
+
       if (this.$store.getters.pairedNodes.length === this.maxNodes) {
         logger("Reached node max", this.maxNodes);
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
       }
+
+      console.log("ids: ", this.$store.getters.pairedNodeIds);
+
+      this.sendData({
+        action: "NETWORK_UPDATE",
+        id: this.id,
+        body: {
+          pairedNodeIds: this.$store.getters.pairedNodeIds
+        }
+      });
     },
     sendData(data) {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
@@ -132,6 +143,13 @@ export default {
           ) {
             this.connectToPeer(data.body.request.requestId);
           }
+          break;
+        case "NETWORK_UPDATE":
+          console.log("data: ", data);
+          this.$store.commit("updateNodeBlackList", {
+            ids: data.body.pairedNodeIds,
+            parentId: data.id
+          });
           break;
         default:
           break;

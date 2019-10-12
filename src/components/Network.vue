@@ -66,16 +66,22 @@ export default {
     },
     updateBlackListedNodes() {
       this.$store.getters.nodeBlackList.forEach(node => {
-        this.nodes.push({
-          id: node.id,
-          _color: "yellow"
-        });
+        if (
+          !_.find(this.nodes, {
+            id: node.id
+          })
+        ) {
+          this.nodes.push({
+            id: node.id,
+            _color: "yellow"
+          });
 
-        this.links.push({
-          sid: node.parentId,
-          tid: node.id,
-          _color: "gray"
-        });
+          this.links.push({
+            sid: node.parentId,
+            tid: node.id,
+            _color: "gray"
+          });
+        }
       });
     }
   }
