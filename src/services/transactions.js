@@ -2,7 +2,7 @@ import * as moment from 'moment'
 
 export const transactions = [
   {
-    id: 1,
+    id: 0,
     timestamp: moment().format('hh:mm:ss.SSS'),
     data: {
       message: 'Start of Transactions'

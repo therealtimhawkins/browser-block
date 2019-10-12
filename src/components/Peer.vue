@@ -14,6 +14,7 @@ import Peer from "peerjs";
 import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
 import { logger } from "../services/logger";
+import { logTransaction } from "../services/transactions";
 import * as Connection from "../services/handshake";
 
 export default {
@@ -120,9 +121,9 @@ export default {
         }
       });
     },
-    sendData(data, blockedNodeId = "noidgiven") {
+    sendData(data, blockedNodeIds = []) {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
-        if (blockedNodeId !== nodeObject.id) {
+        if (!_.includes(blockedNodeIds, nodeObject.id)) {
           nodeObject.node.send(JSON.stringify(data));
         }
       });
@@ -135,7 +136,8 @@ export default {
           pairedNodeIds: this.$store.getters.pairedNodeIds,
           nodeBlackList: this.$store.getters.nodeBlackList,
           message: `Transaction sent from ID=${this.id}`
-        }
+        },
+        history: [this.id]
       });
     },
     dataRouter(data) {
@@ -177,7 +179,7 @@ export default {
                   request: data.body.request.requestId
                 }
               },
-              data.id
+              [data.id]
             );
           }
           break;
@@ -198,6 +200,9 @@ export default {
           break;
         case "TRANSACTION":
           logger("Transaction", data.body.message);
+          logTransaction(data.body.message);
+          data.history.push(this.id);
+          this.sendData(data, data.history);
           break;
         default:
           break;
