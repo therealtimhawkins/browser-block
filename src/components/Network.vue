@@ -24,10 +24,13 @@ export default {
       }
     };
   },
-  computed: mapState(["pairedNodes"]),
+  computed: mapState(["pairedNodes", "nodeBlackList"]),
   watch: {
-    pairedNodes(newPairedNodes, oldPairedNodes) {
-      this.updatePairedNodes(this.$store.getters.pairedNodes);
+    pairedNodes() {
+      this.updatePairedNodes();
+    },
+    nodeBlackList() {
+      this.updateNodeBlackList();
     }
   },
   mounted() {
@@ -36,24 +39,12 @@ export default {
       _color: "palegreen"
     });
 
-    this.updatePairedNodes(this.$store.getters.pairedNodes);
-
-    this.$store.getters.nodeBlackList.forEach(node => {
-      this.node.push({
-        id: node.id,
-        _color: "yellow"
-      });
-
-      this.links.push({
-        sid: node.parentId,
-        tid: node.id,
-        _color: "gray"
-      });
-    });
+    this.updatePairedNodes();
+    this.updateBlackListedNodes();
   },
   methods: {
-    updatePairedNodes(pairedNodes) {
-      pairedNodes.forEach(node => {
+    updatePairedNodes() {
+      this.$store.getters.pairedNodes.forEach(node => {
         if (
           !_.find(this.nodes, {
             id: node.id,
@@ -71,6 +62,20 @@ export default {
             _color: "gray"
           });
         }
+      });
+    },
+    updateBlackListedNodes() {
+      this.$store.getters.nodeBlackList.forEach(node => {
+        this.node.push({
+          id: node.id,
+          _color: "yellow"
+        });
+
+        this.links.push({
+          sid: node.parentId,
+          tid: node.id,
+          _color: "gray"
+        });
       });
     }
   }
