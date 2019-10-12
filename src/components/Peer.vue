@@ -1,8 +1,9 @@
 <template>
   <section>
+    <div class="title is-5 has-text-link">{{this.id}}</div>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
-      <button @click="sendMessage" class="button">Send message</button>
+      <button @click="sendTransaction" class="button">Send message</button>
       <div v-if="this.pollingQueue" class="button is-success">POLLING</div>
     </div>
   </section>
@@ -126,14 +127,14 @@ export default {
         }
       });
     },
-    sendMessage() {
+    sendTransaction() {
       this.sendData({
-        action: "MESSAGE",
+        action: "TRANSACTION",
         id: this.id,
         body: {
           pairedNodeIds: this.$store.getters.pairedNodeIds,
           nodeBlackList: this.$store.getters.nodeBlackList,
-          message: `Message sent from ID=${this.id}`
+          message: `Transaction sent from ID=${this.id}`
         }
       });
     },
@@ -195,8 +196,8 @@ export default {
             });
           });
           break;
-        case "MESSAGE":
-          logger("Message", data.body.message);
+        case "TRANSACTION":
+          logger("Transaction", data.body.message);
           break;
         default:
           break;

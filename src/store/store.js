@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import * as _ from 'lodash'
 
 Vue.use(Vuex)
 
@@ -22,7 +23,7 @@ export const store = new Vuex.Store({
       }
     },
     updateNodeBlackList(state, data) {
-      if (state.nodeBlackList.indexOf(data.id) === -1 && state.id !== data.id) {
+      if (_.includes(state.nodeBlackList, data) && state.id !== data.id) {
         state.nodeBlackList.push({ parentId: data.parentId, id: data.id })
         state.nodeBlackListIds.push(data.id)
       }
