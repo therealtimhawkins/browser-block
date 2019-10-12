@@ -5,6 +5,7 @@
 <script>
 import D3Network from "vue-d3-network";
 import { mapState } from "vuex";
+import _ from "lodash";
 
 export default {
   name: "Network",
@@ -26,7 +27,7 @@ export default {
   computed: mapState(["pairedNodes"]),
   watch: {
     pairedNodes(newPairedNodes, oldPairedNodes) {
-      this.updatePairedNodes();
+      this.updatePairedNodes(this.$store.getters.pairedNodes);
     }
   },
   mounted() {
@@ -35,7 +36,7 @@ export default {
       _color: "palegreen"
     });
 
-    this.updatePairedNodes();
+    this.updatePairedNodes(this.$store.getters.pairedNodes);
 
     this.$store.getters.nodeBlackList.forEach(node => {
       this.node.push({
@@ -51,18 +52,25 @@ export default {
     });
   },
   methods: {
-    updatePairedNodes() {
-      this.$store.getters.pairedNodes.forEach(node => {
-        this.nodes.push({
-          id: node.id,
-          _color: "coral"
-        });
+    updatePairedNodes(pairedNodes) {
+      pairedNodes.forEach(node => {
+        if (
+          !_.find(this.nodes, {
+            id: node.id,
+            _color: "coral"
+          })
+        ) {
+          this.nodes.push({
+            id: node.id,
+            _color: "coral"
+          });
 
-        this.links.push({
-          sid: this.$store.getters.id,
-          tid: node.id,
-          _color: "gray"
-        });
+          this.links.push({
+            sid: this.$store.getters.id,
+            tid: node.id,
+            _color: "gray"
+          });
+        }
       });
     }
   }
