@@ -11,8 +11,23 @@ export default {
   components: {
     D3Network
   },
-  computed() {
-    mapState(["pairedNodes"]);
+  data() {
+    return {
+      nodes: [],
+      links: [],
+      options: {
+        force: 3000,
+        nodeSize: 20,
+        nodeLabels: true,
+        linkWidth: 1
+      }
+    };
+  },
+  computed: mapState(["pairedNodes"]),
+  watch: {
+    pairedNodes(newPairedNodes, oldPairedNodes) {
+      this.updatePairedNodes();
+    }
   },
   mounted() {
     this.nodes.push({
@@ -20,18 +35,7 @@ export default {
       _color: "palegreen"
     });
 
-    this.$store.getters.pairedNodes.forEach(node => {
-      this.nodes.push({
-        id: node.id,
-        _color: "coral"
-      });
-
-      this.links.push({
-        sid: this.$store.getters.id,
-        tid: node.id,
-        _color: "gray"
-      });
-    });
+    this.updatePairedNodes();
 
     this.$store.getters.nodeBlackList.forEach(node => {
       this.node.push({
@@ -46,17 +50,21 @@ export default {
       });
     });
   },
-  data() {
-    return {
-      nodes: [],
-      links: [],
-      options: {
-        force: 3000,
-        nodeSize: 20,
-        nodeLabels: true,
-        linkWidth: 1
-      }
-    };
+  methods: {
+    updatePairedNodes() {
+      this.$store.getters.pairedNodes.forEach(node => {
+        this.nodes.push({
+          id: node.id,
+          _color: "coral"
+        });
+
+        this.links.push({
+          sid: this.$store.getters.id,
+          tid: node.id,
+          _color: "gray"
+        });
+      });
+    }
   }
 };
 </script>
