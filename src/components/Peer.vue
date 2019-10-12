@@ -64,6 +64,7 @@ export default {
         ) {
           this.sendData({
             action: "TRANSFER_PAIR",
+            id: this.id,
             body: {
               request: connRequest
             }
@@ -80,7 +81,6 @@ export default {
       }
     },
     connectToPeer(id, reply = false) {
-      logger("Connection ");
       const noOfPairedNodes = this.$store.getters.pairedNodes.length;
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
@@ -93,43 +93,54 @@ export default {
                 action: "PAIR",
                 id: this.id,
                 body: {
-                  pairedNodeIds: this.$store.getters.pairedNodeIds
+                  pairedNodeIds: this.$store.getters.pairedNodeIds,
+                  nodeBlackList: this.$store.getters.nodeBlackList
                 }
               })
             );
           });
         }
-        this.pollQueue();
       }
 
       if (this.$store.getters.pairedNodes.length === this.maxNodes) {
         logger("Reached node max", this.maxNodes);
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
+      } else {
+        this.pollQueue();
       }
-
-      console.log("ids: ", this.$store.getters.pairedNodeIds);
 
       this.sendData({
         action: "NETWORK_UPDATE",
         id: this.id,
         body: {
-          pairedNodeIds: this.$store.getters.pairedNodeIds
+          pairedNodeIds: this.$store.getters.pairedNodeIds,
+          nodeBlackList: this.$store.getters.nodeBlackList
         }
       });
     },
-    sendData(data) {
+    sendData(data, blockedNodeId = "noidgiven") {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
-        nodeObject.node.send(JSON.stringify(data));
+        if (blockedNodeId !== nodeObject.id) {
+          nodeObject.node.send(JSON.stringify(data));
+        }
       });
     },
     dataRouter(data) {
       logger("Router action", data.action);
       switch (data.action) {
         case "PAIR":
-          this.$store.commit("updateNodeBlackList", {
-            ids: data.body.pairedNodeIds,
-            parentId: data.id
+          data.body.pairedNodeIds.forEach(id => {
+            this.$store.commit("updateNodeBlackList", {
+              id: id,
+              parentId: data.id
+            });
+          });
+          data.body.nodeBlackList.forEach(node => {
+            this.$store.commit("updateNodeBlackList", {
+              id: node.id,
+              parentId: node.parentId
+            });
           });
           this.connectToPeer(data.id, true);
           break;
@@ -139,16 +150,38 @@ export default {
             !_.includes(
               this.$store.getters.pairedNodesIds,
               data.body.request.requestId
+            ) &&
+            !_.includes(
+              this.$store.getters.nodeBlackListIds,
+              data.body.request.requestId
             )
           ) {
             this.connectToPeer(data.body.request.requestId);
+          } else {
+            this.sendData(
+              {
+                action: "TRANSFER_PAIR",
+                body: {
+                  request: data.body.request.requestId
+                }
+              },
+              data.id
+            );
           }
           break;
         case "NETWORK_UPDATE":
-          console.log("data: ", data);
-          this.$store.commit("updateNodeBlackList", {
-            ids: data.body.pairedNodeIds,
-            parentId: data.id
+          logger("Updating network", data.body);
+          data.body.pairedNodeIds.forEach(id => {
+            this.$store.commit("updateNodeBlackList", {
+              id: id,
+              parentId: data.id
+            });
+          });
+          data.body.nodeBlackList.forEach(node => {
+            this.$store.commit("updateNodeBlackList", {
+              id: node.id,
+              parentId: node.parentId
+            });
           });
           break;
         default:
