@@ -2,7 +2,7 @@
   <section>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
-      <button @click="sendData" class="button">Send message</button>
+      <button @click="sendMessage" class="button">Send message</button>
       <div v-if="this.pollingQueue" class="button is-success">POLLING</div>
     </div>
   </section>
@@ -126,6 +126,17 @@ export default {
         }
       });
     },
+    sendMessage() {
+      this.sendData({
+        action: "MESSAGE",
+        id: this.id,
+        body: {
+          pairedNodeIds: this.$store.getters.pairedNodeIds,
+          nodeBlackList: this.$store.getters.nodeBlackList,
+          message: `Message sent from ID=${this.id}`
+        }
+      });
+    },
     dataRouter(data) {
       logger("Router action", data.action);
       switch (data.action) {
@@ -183,6 +194,9 @@ export default {
               parentId: node.parentId
             });
           });
+          break;
+        case "MESSAGE":
+          logger("Message", data.body.message);
           break;
         default:
           break;

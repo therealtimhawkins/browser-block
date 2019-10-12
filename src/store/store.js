@@ -22,7 +22,6 @@ export const store = new Vuex.Store({
       }
     },
     updateNodeBlackList(state, data) {
-      console.log(data)
       if (state.nodeBlackList.indexOf(data.id) === -1 && state.id !== data.id) {
         state.nodeBlackList.push({ parentId: data.parentId, id: data.id })
         state.nodeBlackListIds.push(data.id)
