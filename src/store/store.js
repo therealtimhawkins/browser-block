@@ -34,6 +34,16 @@ export const store = new Vuex.Store({
     pairedNodes: state => state.pairedNodes,
     pairedNodeIds: state => state.pairedNodeIds,
     nodeBlackList: state => state.nodeBlackList,
-    nodeBlackListIds: state => state.nodeBlackListIds
+    nodeBlackListIds: state => state.nodeBlackListIds.forEach,
+    isPaired: state => {
+      return id => {
+        return !_.find(state.pairedNodeIds, id)
+      }
+    },
+    isListed: state => {
+      return id => {
+        return !_.find(state.nodeBlackListIds, id)
+      }
+    }
   }
 })

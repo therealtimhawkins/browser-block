@@ -15,7 +15,7 @@ import Peer from "peerjs";
 import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
 import { logger } from "../services/logger";
-import { logTransaction } from "../services/transactions";
+import { router } from "../services/router";
 import * as Connection from "../services/handshake";
 
 export default {
@@ -88,6 +88,8 @@ export default {
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         this.$store.commit("updatePairedNodes", { id, node });
+        this.$store.commit("updateNodeBlackList", { id, parentId: this.id });
+
         logger("Paired nodes", this.$store.getters.pairedNodes.length);
         if (!reply) {
           node.on("open", () => {
@@ -145,13 +147,13 @@ export default {
       logger("Node list", this.$store.getters.nodeBlackList);
     },
     updateLists(data) {
-      data.pairedNodeIds.forEach(id => {
+      data.body.pairedNodeIds.forEach(id => {
         this.$store.commit("updateNodeBlackList", {
           id: id,
           parentId: data.id
         });
       });
-      data.nodeBlackList.forEach(node => {
+      data.body.nodeBlackList.forEach(node => {
         this.$store.commit("updateNodeBlackList", {
           id: node.id,
           parentId: node.parentId
@@ -160,50 +162,7 @@ export default {
     },
     dataRouter(data) {
       logger("Router action", data.action);
-      switch (data.action) {
-        case "PAIR":
-          this.updateLists(data.body);
-          this.connectToPeer(data.id, true);
-          break;
-        case "TRANSFER_PAIR":
-          logger("Transfer data", data.body);
-          if (
-            !_.includes(
-              this.$store.getters.pairedNodesIds,
-              data.body.request.requestId
-            ) &&
-            !_.includes(
-              this.$store.getters.nodeBlackListIds,
-              data.body.request.requestId
-            )
-          ) {
-            this.connectToPeer(data.body.request.requestId);
-          } else {
-            this.sendData(
-              {
-                action: "TRANSFER_PAIR",
-                body: {
-                  request: data.body.request.requestId
-                }
-              },
-              [data.id]
-            );
-          }
-          break;
-        case "NETWORK_UPDATE":
-          logger("Updating network", data.body);
-          this.updateLists(data.body);
-          break;
-        case "TRANSACTION":
-          logger("Transaction", data.body.message);
-          logTransaction(data);
-          this.updateLists(data.body);
-          data.history.push(this.id);
-          this.sendData(data, data.history);
-          break;
-        default:
-          break;
-      }
+      router(data, this);
     }
   }
 };

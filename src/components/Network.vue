@@ -5,7 +5,6 @@
 <script>
 import D3Network from "vue-d3-network";
 import { mapState } from "vuex";
-import _ from "lodash";
 
 export default {
   name: "Network",
@@ -26,11 +25,8 @@ export default {
   },
   computed: mapState(["pairedNodes", "nodeBlackList"]),
   watch: {
-    pairedNodes() {
-      this.updatePairedNodes();
-    },
     nodeBlackList() {
-      this.updateBlackListedNodes();
+      this.updateNodes();
     }
   },
   mounted() {
@@ -38,60 +34,28 @@ export default {
       id: this.$store.getters.id
     });
 
-    this.updatePairedNodes();
-    this.updateBlackListedNodes();
+    this.updateNodes();
   },
   methods: {
-    updatePairedNodes() {
-      this.$store.getters.pairedNodes.forEach(node => {
-        if (
-          !_.find(this.nodes, {
-            id: node.id
-          })
-        ) {
+    updateNodes() {
+      this.$store.getters.nodeBlackList.forEach(node => {
+        if (!this.nodeExists(node.id)) {
           this.nodes.push({
             id: node.id
           });
         }
-        if (
-          !_.find(this.links, {
-            sid: this.$store.getters.id,
-            tid: node.id,
-            _color: "gray"
-          })
-        ) {
+        if (this.nodeExists(node.parentId) && this.nodeExists(node.id)) {
           this.links.push({
-            sid: this.$store.getters.id,
+            sid: node.parentId,
             tid: node.id,
             _color: "gray"
           });
         }
       });
     },
-    updateBlackListedNodes() {
-      this.$store.getters.nodeBlackList.forEach(node => {
-        if (
-          !_.find(this.nodes, {
-            id: node.id
-          })
-        ) {
-          this.nodes.push({
-            id: node.id
-          });
-        }
-        if (
-          !_.find(this.links, {
-            sid: node.parentId,
-            tid: node.id,
-            _color: "gray"
-          })
-        ) {
-          this.links.push({
-            sid: node.parentId,
-            tid: node.id,
-            _color: "gray"
-          });
-        }
+    nodeExists(id) {
+      return this.nodes.some(node => {
+        return node.id === id;
       });
     }
   }
