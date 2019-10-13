@@ -144,22 +144,25 @@ export default {
     showNodeList() {
       logger("Node list", this.$store.getters.nodeBlackList);
     },
+    updateLists(data) {
+      data.pairedNodeIds.forEach(id => {
+        this.$store.commit("updateNodeBlackList", {
+          id: id,
+          parentId: data.id
+        });
+      });
+      data.nodeBlackList.forEach(node => {
+        this.$store.commit("updateNodeBlackList", {
+          id: node.id,
+          parentId: node.parentId
+        });
+      });
+    },
     dataRouter(data) {
       logger("Router action", data.action);
       switch (data.action) {
         case "PAIR":
-          data.body.pairedNodeIds.forEach(id => {
-            this.$store.commit("updateNodeBlackList", {
-              id: id,
-              parentId: data.id
-            });
-          });
-          data.body.nodeBlackList.forEach(node => {
-            this.$store.commit("updateNodeBlackList", {
-              id: node.id,
-              parentId: node.parentId
-            });
-          });
+          this.updateLists(data.body);
           this.connectToPeer(data.id, true);
           break;
         case "TRANSFER_PAIR":
@@ -189,34 +192,12 @@ export default {
           break;
         case "NETWORK_UPDATE":
           logger("Updating network", data.body);
-          data.body.pairedNodeIds.forEach(id => {
-            this.$store.commit("updateNodeBlackList", {
-              id: id,
-              parentId: data.id
-            });
-          });
-          data.body.nodeBlackList.forEach(node => {
-            this.$store.commit("updateNodeBlackList", {
-              id: node.id,
-              parentId: node.parentId
-            });
-          });
+          this.updateLists(data.body);
           break;
         case "TRANSACTION":
           logger("Transaction", data.body.message);
           logTransaction(data);
-          data.body.pairedNodeIds.forEach(id => {
-            this.$store.commit("updateNodeBlackList", {
-              id: id,
-              parentId: data.id
-            });
-          });
-          data.body.nodeBlackList.forEach(node => {
-            this.$store.commit("updateNodeBlackList", {
-              id: node.id,
-              parentId: node.parentId
-            });
-          });
+          this.updateLists(data.body);
           data.history.push(this.id);
           this.sendData(data, data.history);
           break;
