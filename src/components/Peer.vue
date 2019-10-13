@@ -1,9 +1,10 @@
 <template>
   <section>
-    <div class="title is-5 has-text-link">{{this.id}}</div>
+    <div class="title is-5 has-text-link" id="id-title">{{this.id}}</div>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
-      <button @click="sendTransaction" class="button">Send message</button>
+      <button @click="sendTransaction" class="button" id="send-message">Send message</button>
+      <button @click="showNodeList" class="button">Node list</button>
       <div v-if="this.pollingQueue" class="button is-success">POLLING</div>
     </div>
   </section>
@@ -140,6 +141,9 @@ export default {
         history: [this.id]
       });
     },
+    showNodeList() {
+      logger("Node list", this.$store.getters.nodeBlackList);
+    },
     dataRouter(data) {
       logger("Router action", data.action);
       switch (data.action) {
@@ -200,7 +204,19 @@ export default {
           break;
         case "TRANSACTION":
           logger("Transaction", data.body.message);
-          logTransaction(data.body.message);
+          logTransaction(data);
+          data.body.pairedNodeIds.forEach(id => {
+            this.$store.commit("updateNodeBlackList", {
+              id: id,
+              parentId: data.id
+            });
+          });
+          data.body.nodeBlackList.forEach(node => {
+            this.$store.commit("updateNodeBlackList", {
+              id: node.id,
+              parentId: node.parentId
+            });
+          });
           data.history.push(this.id);
           this.sendData(data, data.history);
           break;

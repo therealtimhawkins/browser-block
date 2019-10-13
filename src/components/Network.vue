@@ -35,8 +35,7 @@ export default {
   },
   mounted() {
     this.nodes.push({
-      id: this.$store.getters.id,
-      _color: "palegreen"
+      id: this.$store.getters.id
     });
 
     this.updatePairedNodes();
@@ -47,15 +46,20 @@ export default {
       this.$store.getters.pairedNodes.forEach(node => {
         if (
           !_.find(this.nodes, {
-            id: node.id,
-            _color: "coral"
+            id: node.id
           })
         ) {
           this.nodes.push({
-            id: node.id,
-            _color: "coral"
+            id: node.id
           });
-
+        }
+        if (
+          !_.find(this.links, {
+            sid: this.$store.getters.id,
+            tid: node.id,
+            _color: "gray"
+          })
+        ) {
           this.links.push({
             sid: this.$store.getters.id,
             tid: node.id,
@@ -72,10 +76,16 @@ export default {
           })
         ) {
           this.nodes.push({
-            id: node.id,
-            _color: "yellow"
+            id: node.id
           });
-
+        }
+        if (
+          !_.find(this.links, {
+            sid: node.parentId,
+            tid: node.id,
+            _color: "gray"
+          })
+        ) {
           this.links.push({
             sid: node.parentId,
             tid: node.id,
