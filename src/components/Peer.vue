@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div class="title is-5 has-text-link" id="id-title">{{this.id}}</div>
+    <div class="title is-5 has-text-link" id="id-title">{{this.$store.getters.id}}</div>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
       <button @click="sendTransaction" class="button" id="send-message">Send message</button>
@@ -12,7 +12,6 @@
 
 <script>
 import Peer from "peerjs";
-import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
@@ -22,18 +21,14 @@ export default {
   name: "Peer",
   data: () => {
     return {
-      id: null,
       peer: null,
       pollingQueue: null,
       pairedNodes: [],
-      maxNodes: 2
+      maxNodes: 3
     };
   },
   created() {
-    this.id = uuidv1();
-    this.$store.commit("addId", this.id);
-    logger("ID", this.id);
-    this.peer = new Peer(this.id);
+    this.peer = new Peer(this.$store.getters.id);
 
     this.peer.on("connection", connection => {
       connection.on("data", data => {
@@ -45,18 +40,14 @@ export default {
     this.pollQueue();
   },
   methods: {
-    nodeBlackListed(id) {
-      const blackListed = this.$store.getters.nodeBlackList.indexOf(id) !== -1;
-      return blackListed;
-    },
     pollQueue() {
       logger("Polling queue...");
       this.pollingQueue = setInterval(async () => {
-        const connRequest = await Connection.get(this.id);
-        const blackListed = this.nodeBlackListed(connRequest.requestId);
+        const connRequest = await Connection.get(this.$store.getters.id);
+        const isLinked = this.$store.getters.isLinked(connRequest.requestId);
         if (
           connRequest.requestId &&
-          !blackListed &&
+          !isLinked &&
           this.$store.getters.pairedNodes.length < this.maxNodes
         ) {
           logger("Connection ID", connRequest);
@@ -67,7 +58,7 @@ export default {
         ) {
           this.sendData({
             action: "TRANSFER_PAIR",
-            id: this.id,
+            id: this.$store.getters.id,
             body: {
               request: connRequest
             }
@@ -76,8 +67,8 @@ export default {
       }, 2000);
     },
     async requestConnection() {
-      const success = await Connection.request(this.id);
-      logger(`Connection with ${this.id}`, { status: success });
+      const success = await Connection.request(this.$store.getters.id);
+      logger(`Connection with ${this.$store.getters.id}`, { status: success });
       if (success) {
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
@@ -88,7 +79,7 @@ export default {
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         this.$store.commit("updatePairedNodes", { id, node });
-        this.$store.commit("updateNodeBlackList", { id, parentId: this.id });
+        this.$store.commit("updateLinks", [id, this.$store.getters.id]);
 
         logger("Paired nodes", this.$store.getters.pairedNodes.length);
         if (!reply) {
@@ -96,10 +87,10 @@ export default {
             node.send(
               JSON.stringify({
                 action: "PAIR",
-                id: this.id,
+                id: this.$store.getters.id,
                 body: {
                   pairedNodeIds: this.$store.getters.pairedNodeIds,
-                  nodeBlackList: this.$store.getters.nodeBlackList
+                  links: this.$store.getters.links
                 }
               })
             );
@@ -117,10 +108,10 @@ export default {
 
       this.sendData({
         action: "NETWORK_UPDATE",
-        id: this.id,
+        id: this.$store.getters.id,
         body: {
           pairedNodeIds: this.$store.getters.pairedNodeIds,
-          nodeBlackList: this.$store.getters.nodeBlackList
+          links: this.$store.getters.links
         }
       });
     },
@@ -134,34 +125,24 @@ export default {
     sendTransaction() {
       this.sendData({
         action: "TRANSACTION",
-        id: this.id,
+        id: this.$store.getters.id,
         body: {
           pairedNodeIds: this.$store.getters.pairedNodeIds,
-          nodeBlackList: this.$store.getters.nodeBlackList,
-          message: `Transaction sent from ID=${this.id}`
+          links: this.$store.getters.links,
+          message: `Transaction sent from ID=${this.$store.getters.id}`
         },
-        history: [this.id]
+        history: [this.$store.getters.id]
       });
     },
     showNodeList() {
-      logger("Node list", this.$store.getters.nodeBlackList);
+      logger("Node list", this.$store.getters.linkedNodeIds);
     },
-    updateLists(data) {
-      data.body.pairedNodeIds.forEach(id => {
-        this.$store.commit("updateNodeBlackList", {
-          id: id,
-          parentId: data.id
-        });
-      });
-      data.body.nodeBlackList.forEach(node => {
-        this.$store.commit("updateNodeBlackList", {
-          id: node.id,
-          parentId: node.parentId
-        });
+    updateLinks(links) {
+      links.forEach(link => {
+        this.$store.commit("updateLinks", link);
       });
     },
     dataRouter(data) {
-      logger("Router action", data.action);
       router(data, this);
     }
   }

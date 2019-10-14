@@ -23,40 +23,41 @@ export default {
       }
     };
   },
-  computed: mapState(["pairedNodes", "nodeBlackList"]),
+  computed: mapState(["linkedNodeIds"]),
   watch: {
-    nodeBlackList() {
+    linkedNodeIds() {
       this.updateNodes();
     }
   },
-  mounted() {
+  created() {
     this.nodes.push({
-      id: this.$store.getters.id
+      id: this.$store.getters.id,
+      _color: "coral"
     });
-
+  },
+  mounted() {
     this.updateNodes();
   },
   methods: {
     updateNodes() {
-      this.$store.getters.nodeBlackList.forEach(node => {
-        if (!this.nodeExists(node.id)) {
-          this.nodes.push({
-            id: node.id
-          });
+      this.$store.getters.linkedNodeIds.forEach(nodeId => {
+        if (!this.nodeExists(nodeId)) {
+          this.nodes.push({ id: nodeId });
         }
-        if (this.nodeExists(node.parentId) && this.nodeExists(node.id)) {
-          this.links.push({
-            sid: node.parentId,
-            tid: node.id,
-            _color: "gray"
-          });
-        }
+      });
+
+      this.$store.getters.links.forEach(link => {
+        this.links.push({ sid: link[0], tid: link[1], _color: "gray" });
       });
     },
     nodeExists(id) {
-      return this.nodes.some(node => {
-        return node.id === id;
+      let exists = false;
+      this.nodes.forEach(node => {
+        if (node.id === id) {
+          exists = true;
+        }
       });
+      return exists;
     }
   }
 };

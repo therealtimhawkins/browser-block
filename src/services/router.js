@@ -5,7 +5,7 @@ export const router = (data, Peer) => {
   logger('Router action', data.action)
   switch (data.action) {
     case 'PAIR':
-      Peer.updateLists(data)
+      Peer.updateLinks(data.body.links)
       Peer.connectToPeer(data.id, true)
       break
     case 'TRANSFER_PAIR':
@@ -29,14 +29,14 @@ export const router = (data, Peer) => {
       break
     case 'NETWORK_UPDATE':
       logger('Updating network', data.body)
-      Peer.updateLists(data)
+      Peer.updateLinks(data.body.links)
       break
     case 'TRANSACTION':
       logger('Transaction', data.body.message)
       logTransaction(data)
 
-      Peer.updateLists(data)
-      data.history.push(this.id)
+      Peer.updateLinks(data.body.links)
+      data.history.push(Peer.$store.getters.id)
       Peer.sendData(data, data.history)
       break
     default:

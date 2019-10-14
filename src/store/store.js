@@ -9,8 +9,8 @@ export const store = new Vuex.Store({
     id: '',
     pairedNodes: [],
     pairedNodeIds: [],
-    nodeBlackList: [],
-    nodeBlackListIds: []
+    links: [],
+    linkedNodeIds: []
   },
   mutations: {
     addId(state, id) {
@@ -22,28 +22,44 @@ export const store = new Vuex.Store({
         state.pairedNodeIds.push(node.id)
       }
     },
-    updateNodeBlackList(state, data) {
-      if (!_.find(state.nodeBlackList, data) && state.id !== data.id) {
-        state.nodeBlackList.push({ parentId: data.parentId, id: data.id })
-        state.nodeBlackListIds.push(data.id)
+    updateLinks(state, link) {
+      if (!linkExists(state.links, link)) {
+        state.links.push(link.sort())
       }
+      link.forEach(linkId => {
+        if (linkId === state.id) {
+          return
+        }
+        if (_.includes(state.linkedNodeIds, linkId)) {
+          return
+        }
+        state.linkedNodeIds.push(linkId)
+      })
     }
   },
   getters: {
     id: state => state.id,
     pairedNodes: state => state.pairedNodes,
     pairedNodeIds: state => state.pairedNodeIds,
-    nodeBlackList: state => state.nodeBlackList,
-    nodeBlackListIds: state => state.nodeBlackListIds.forEach,
+    links: state => state.links,
+    linkedNodeIds: state => state.linkedNodeIds,
     isPaired: state => {
       return id => {
         return !_.find(state.pairedNodeIds, id)
       }
     },
-    isListed: state => {
+    isLinked: state => {
       return id => {
-        return !_.find(state.nodeBlackListIds, id)
+        return _.find(state.linkedNodeIds, id)
       }
     }
   }
 })
+
+const linkExists = (links, link) => {
+  const check = JSON.stringify(links).indexOf(JSON.stringify(link.sort()))
+  if (check != -1) {
+    return true
+  }
+  return false
+}

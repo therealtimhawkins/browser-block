@@ -12,6 +12,8 @@
 <script>
 import Logs from "./components/Logs.vue";
 import Network from "./components/Network";
+import * as uuidv1 from "uuid/v1";
+import { logger } from "./services/logger";
 
 export default {
   name: "app",
@@ -21,9 +23,17 @@ export default {
   },
   data() {
     return {
+      id: null,
       network: false,
       logs: true
     };
+  },
+  created() {
+    if (!this.id) {
+      this.id = uuidv1();
+      this.$store.commit("addId", this.id);
+    }
+    logger("ID", this.id);
   },
   methods: {
     selectView(view) {
