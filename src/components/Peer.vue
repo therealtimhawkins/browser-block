@@ -107,14 +107,7 @@ export default {
         this.pollQueue();
       }
 
-      this.sendData({
-        action: "NETWORK_UPDATE",
-        id: this.$store.getters.id,
-        body: {
-          pairedNodeIds: this.$store.getters.pairedNodeIds,
-          links: this.$store.getters.links
-        }
-      });
+      Actions.networkUpdate(this);
     },
     sendData(data, blockedNodeIds = []) {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
