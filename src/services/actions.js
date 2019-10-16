@@ -1,3 +1,5 @@
+import { logTransaction } from './transactions'
+
 export const pair = (Peer, node) => {
   node.send(
     JSON.stringify({
@@ -12,19 +14,18 @@ export const pair = (Peer, node) => {
 }
 
 export const makeTransaction = Peer => {
-  Peer.sendData(
-    {
-      action: 'TRANSACTION',
-      id: Peer.$store.getters.id,
-      body: {
-        pairedNodeIds: Peer.$store.getters.pairedNodeIds,
-        links: Peer.$store.getters.links,
-        message: `Transaction sent from ID=${Peer.$store.getters.id}`
-      },
-      history: [Peer.$store.getters.id]
+  const data = {
+    action: 'TRANSACTION',
+    id: Peer.$store.getters.id,
+    body: {
+      pairedNodeIds: Peer.$store.getters.pairedNodeIds,
+      links: Peer.$store.getters.links,
+      message: `Transaction sent from ID=${Peer.$store.getters.id}`
     },
-    Peer.$store.getters.pairedNodes
-  )
+    history: [Peer.$store.getters.id]
+  }
+  Peer.sendData(data, Peer.$store.getters.pairedNodes)
+  logTransaction(data)
 }
 
 export const networkUpdate = Peer => {
