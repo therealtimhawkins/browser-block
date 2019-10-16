@@ -1,3 +1,16 @@
+export const pair = (Peer, node) => {
+  node.send(
+    JSON.stringify({
+      action: 'PAIR',
+      id: Peer.$store.getters.id,
+      body: {
+        pairedNodeIds: Peer.$store.getters.pairedNodeIds,
+        links: Peer.$store.getters.links
+      }
+    })
+  )
+}
+
 export const makeTransaction = Peer => {
   Peer.sendData(
     {

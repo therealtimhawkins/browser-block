@@ -79,16 +79,7 @@ export default {
         logger("Paired nodes", this.$store.getters.pairedNodes.length);
         if (!reply) {
           node.on("open", () => {
-            node.send(
-              JSON.stringify({
-                action: "PAIR",
-                id: this.$store.getters.id,
-                body: {
-                  pairedNodeIds: this.$store.getters.pairedNodeIds,
-                  links: this.$store.getters.links
-                }
-              })
-            );
+            Actions.pair(this, node);
           });
         }
       }
