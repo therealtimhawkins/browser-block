@@ -103,7 +103,7 @@ export default {
 
       Actions.networkUpdate(this);
     },
-    sendData(data, blockedNodeIds = []) {
+    sendData(data, nodes, blockedNodeIds = []) {
       this.$store.getters.pairedNodes.forEach(nodeObject => {
         if (!_.includes(blockedNodeIds, nodeObject.id)) {
           nodeObject.node.send(JSON.stringify(data));
