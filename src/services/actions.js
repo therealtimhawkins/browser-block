@@ -21,3 +21,13 @@ export const networkUpdate = Peer => {
     }
   })
 }
+
+export const transferPair = (Peer, connRequest) => {
+  Peer.sendData({
+    action: 'TRANSFER_PAIR',
+    id: this.$store.getters.id,
+    body: {
+      request: connRequest
+    }
+  })
+}

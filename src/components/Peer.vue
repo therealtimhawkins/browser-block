@@ -57,13 +57,7 @@ export default {
           connRequest.requestId &&
           this.$store.getters.pairedNodes.length === this.maxNodes
         ) {
-          this.sendData({
-            action: "TRANSFER_PAIR",
-            id: this.$store.getters.id,
-            body: {
-              request: connRequest
-            }
-          });
+          Actions.transferPair(Peer, connRequest);
         }
       }, 2000);
     },
