@@ -16,6 +16,7 @@ import * as _ from "lodash";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Connection from "../services/handshake";
+import * as Actions from "../services/actions";
 
 export default {
   name: "Peer",
@@ -123,16 +124,7 @@ export default {
       });
     },
     sendTransaction() {
-      this.sendData({
-        action: "TRANSACTION",
-        id: this.$store.getters.id,
-        body: {
-          pairedNodeIds: this.$store.getters.pairedNodeIds,
-          links: this.$store.getters.links,
-          message: `Transaction sent from ID=${this.$store.getters.id}`
-        },
-        history: [this.$store.getters.id]
-      });
+      Actions.makeTransaction(this);
     },
     showNodeList() {
       logger("Node list", this.$store.getters.linkedNodeIds);
