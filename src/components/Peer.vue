@@ -30,7 +30,6 @@ export default {
   },
   created() {
     this.peer = new Peer(this.$store.getters.id);
-
     this.peer.on("connection", connection => {
       connection.on("data", data => {
         logger("Data recieved", data);
@@ -95,7 +94,7 @@ export default {
       Actions.networkUpdate(this);
     },
     sendData(data, nodes, blockedNodeIds = []) {
-      this.$store.getters.pairedNodes.forEach(nodeObject => {
+      nodes.forEach(nodeObject => {
         if (!_.includes(blockedNodeIds, nodeObject.id)) {
           nodeObject.node.send(JSON.stringify(data));
         }

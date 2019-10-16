@@ -23,6 +23,7 @@ export const router = (data, Peer) => {
               request: data.body.request.requestId
             }
           },
+          Peer.$store.getters.pairedNodes,
           [data.id]
         )
       }
@@ -37,7 +38,7 @@ export const router = (data, Peer) => {
 
       Peer.updateLinks(data.body.links)
       data.history.push(Peer.$store.getters.id)
-      Peer.sendData(data, data.history)
+      Peer.sendData(data, Peer.$store.getters.pairedNodes, data.history)
       break
     default:
       break
