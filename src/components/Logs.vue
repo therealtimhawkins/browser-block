@@ -1,11 +1,11 @@
 <template>
   <aside class="section">
     <Peer />
-    <br />
-    <div>Logs</div>
-    <br />
     <div class="columns">
       <div class="column is-two-thirds">
+        <br />
+        <div>Logs</div>
+        <br />
         <div v-for="(log) in this.logs.slice().reverse()" :key="'log-' + log.id">
           <div class="box is-scrollable" id="log-box">
             <div class="columns">
@@ -30,6 +30,9 @@
         </div>
       </div>
       <div class="column">
+        <br />
+        <div>Transactions</div>
+        <br />
         <div
           v-for="(transaction) in this.transactions.slice().reverse()"
           :key="'transaction-' + transaction.id"
