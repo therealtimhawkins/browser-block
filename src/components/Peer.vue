@@ -12,6 +12,7 @@
 
 <script>
 import Peer from "peerjs";
+import * as Network from "../services/network/index";
 import * as _ from "lodash";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
@@ -29,7 +30,7 @@ export default {
     };
   },
   created() {
-    this.peer = new Peer(this.$store.getters.id);
+    this.peer = Network.initPeer(this.$store.getters.id);
     this.peer.on("connection", connection => {
       connection.on("data", data => {
         logger("Data recieved", data);
