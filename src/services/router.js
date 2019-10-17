@@ -1,10 +1,11 @@
 import { logger } from './logger'
-import { logTransaction } from './transactions'
+import { logTransaction, initTransactions } from './transactions'
 
 export const router = (data, Peer) => {
   logger('Router action', data.action)
   switch (data.action) {
     case 'PAIR':
+      initTransactions(data.body.transactions)
       Peer.updateLinks(data.body.links)
       Peer.connectToPeer(data.id, true)
       break

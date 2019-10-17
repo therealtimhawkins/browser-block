@@ -10,7 +10,7 @@
           <div class="box is-scrollable" id="log-box">
             <div class="columns">
               <div
-                class="column is-one-quarter has-text-weight-semibold has-text-primary"
+                class="column is-one-quarter has-text-weight-semibold has-text-link"
                 v-bind:class="getColour(log.title)"
               >{{log.timestamp}}</div>
               <div class="column">

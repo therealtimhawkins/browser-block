@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div class="title is-5 has-text-link" id="id-title">{{this.$store.getters.id}}</div>
+    <div class="title is-5 has-text-primary" id="id-title">{{this.$store.getters.id}}</div>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
       <button @click="sendTransaction" class="button" id="send-message">Send message</button>

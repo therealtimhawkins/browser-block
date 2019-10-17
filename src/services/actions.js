@@ -1,4 +1,4 @@
-import { logTransaction } from './transactions'
+import { transactions, logTransaction } from './transactions'
 
 export const pair = (Peer, node) => {
   node.send(
@@ -7,7 +7,8 @@ export const pair = (Peer, node) => {
       id: Peer.$store.getters.id,
       body: {
         pairedNodeIds: Peer.$store.getters.pairedNodeIds,
-        links: Peer.$store.getters.links
+        links: Peer.$store.getters.links,
+        transactions
       }
     })
   )

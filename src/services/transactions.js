@@ -18,3 +18,10 @@ export const logTransaction = data => {
     data
   })
 }
+
+export const initTransactions = data => {
+  transactions.pop()
+  data.forEach(transaction => {
+    transactions.push(transaction)
+  })
+}
