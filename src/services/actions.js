@@ -1,4 +1,7 @@
-import { logTransaction } from './transactions'
+import _ from 'lodash'
+import {
+  logTransaction
+} from './transactions'
 
 export const pair = (Peer, node) => {
   node.send(
@@ -24,13 +27,12 @@ export const makeTransaction = Peer => {
     },
     history: [Peer.$store.getters.id]
   }
-  Peer.sendData(data, Peer.$store.getters.pairedNodes)
+  sendData(data, Peer.$store.getters.pairedNodes)
   logTransaction(data)
 }
 
 export const networkUpdate = Peer => {
-  Peer.sendData(
-    {
+  sendData({
       action: 'NETWORK_UPDATE',
       id: Peer.$store.getters.id,
       body: {
@@ -43,8 +45,7 @@ export const networkUpdate = Peer => {
 }
 
 export const transferPair = (Peer, connRequest) => {
-  Peer.sendData(
-    {
+  sendData({
       action: 'TRANSFER_PAIR',
       id: this.$store.getters.id,
       body: {
@@ -53,4 +54,12 @@ export const transferPair = (Peer, connRequest) => {
     },
     Peer.$store.getters.pairedNodes
   )
+}
+
+const sendData = (data, nodes, blockedNodeIds = []) => {
+  nodes.forEach(nodeObject => {
+    if (!_.includes(blockedNodeIds, nodeObject.id)) {
+      nodeObject.node.send(JSON.stringify(data));
+    }
+  });
 }

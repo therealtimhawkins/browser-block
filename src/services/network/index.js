@@ -4,5 +4,6 @@ let peer
 
 export const initPeer = (id) => {
   peer = new Peer(id);
+
   return peer
 }

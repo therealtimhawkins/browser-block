@@ -13,7 +13,6 @@
 <script>
 import Peer from "peerjs";
 import * as Network from "../services/network/index";
-import * as _ from "lodash";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Connection from "../services/handshake";
@@ -93,13 +92,6 @@ export default {
       }
 
       Actions.networkUpdate(this);
-    },
-    sendData(data, nodes, blockedNodeIds = []) {
-      nodes.forEach(nodeObject => {
-        if (!_.includes(blockedNodeIds, nodeObject.id)) {
-          nodeObject.node.send(JSON.stringify(data));
-        }
-      });
     },
     sendTransaction() {
       Actions.makeTransaction(this);
