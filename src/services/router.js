@@ -1,5 +1,6 @@
 import { logger } from './logger'
 import { logTransaction, initTransactions } from './transactions'
+import * as Network from './network/index'
 
 export const router = (data, Peer) => {
   logger('Router action', data.action)
@@ -24,7 +25,7 @@ export const router = (data, Peer) => {
               request: data.body.request.requestId
             }
           },
-          Peer.$store.getters.pairedNodes,
+          Network.getPairedNodes(),
           [data.id]
         )
       }
@@ -39,7 +40,7 @@ export const router = (data, Peer) => {
 
       Peer.updateLinks(data.body.links)
       data.history.push(Peer.$store.getters.id)
-      Peer.sendData(data, Peer.$store.getters.pairedNodes, data.history)
+      Peer.sendData(data, Network.getPairedNodes(), data.history)
       break
     default:
       break

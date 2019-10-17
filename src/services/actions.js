@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { logTransaction, transactions } from './transactions'
+import * as Network from './network/index'
 
 export const pair = (Peer, node) => {
   node.send(
@@ -7,7 +8,7 @@ export const pair = (Peer, node) => {
       action: 'PAIR',
       id: Peer.$store.getters.id,
       body: {
-        pairedNodeIds: Peer.$store.getters.pairedNodeIds,
+        pairedNodeIds: Network.getPairedNodeIds(),
         links: Peer.$store.getters.links,
         transactions
       }
@@ -20,13 +21,13 @@ export const makeTransaction = Peer => {
     action: 'TRANSACTION',
     id: Peer.$store.getters.id,
     body: {
-      pairedNodeIds: Peer.$store.getters.pairedNodeIds,
+      pairedNodeIds: Network.getPairedNodeIds(),
       links: Peer.$store.getters.links,
       message: `Transaction sent from ID=${Peer.$store.getters.id}`
     },
     history: [Peer.$store.getters.id]
   }
-  sendData(data, Peer.$store.getters.pairedNodes)
+  sendData(data, Network.getPairedNodes())
   logTransaction(data)
 }
 
@@ -36,11 +37,11 @@ export const networkUpdate = Peer => {
       action: 'NETWORK_UPDATE',
       id: Peer.$store.getters.id,
       body: {
-        pairedNodeIds: Peer.$store.getters.pairedNodeIds,
+        pairedNodeIds: Network.getPairedNodeIds(),
         links: Peer.$store.getters.links
       }
     },
-    Peer.$store.getters.pairedNodes
+    Network.getPairedNodes()
   )
 }
 
