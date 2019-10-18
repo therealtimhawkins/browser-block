@@ -4,14 +4,15 @@
       <button @click="selectView('logs')" class="button" id="logs-button">Logs</button>
       <button @click="selectView('network')" class="button" id="network-button">Network</button>
     </div>
-    <Network v-if="this.network" />
+    <NetworkGraph v-if="this.network" />
     <Logs v-if="this.logs" />
   </section>
 </template>
 
 <script>
 import Logs from "./components/Logs.vue";
-import Network from "./components/Network";
+import NetworkGraph from "./components/Network";
+import * as Network from "./components/Network";
 import * as uuidv1 from "uuid/v1";
 import { logger } from "./services/logger";
 
@@ -19,7 +20,7 @@ export default {
   name: "app",
   components: {
     Logs,
-    Network
+    NetworkGraph
   },
   data() {
     return {
@@ -31,6 +32,7 @@ export default {
   created() {
     if (!this.id) {
       this.id = uuidv1();
+      Network.setId(this.id);
       this.$store.commit("addId", this.id);
     }
     logger("ID", this.id);

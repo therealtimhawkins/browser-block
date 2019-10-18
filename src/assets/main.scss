@@ -4,4 +4,6 @@ $fullhd-enabled: false;
 $control-radius: 0px;
 $box-radius: 0px;
 
+@import '../../node_modules/bulmaswatch/darkly/variables';
 @import '../../node_modules/bulma/bulma.sass';
+@import '../../node_modules/bulmaswatch/darkly/overrides';
