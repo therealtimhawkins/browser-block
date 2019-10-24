@@ -73,7 +73,7 @@ export default {
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         Network.updatePairedNodes({ id, node });
-        this.$store.commit("updateLinks", [id, this.$store.getters.id]);
+        Network.updateLinks([id, this.$store.getters.id]);
 
         logger("Paired nodes", Network.getPairedNodes().length);
         if (!reply) {

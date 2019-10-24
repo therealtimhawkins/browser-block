@@ -55,6 +55,7 @@ export const updateLinks = link => {
     }
     linkedNodeIds.push(linkId)
   })
+  console.log(links)
 }
 
 export const getLinks = () => {
