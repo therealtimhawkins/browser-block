@@ -42,7 +42,7 @@ const linkExists = (links, link) => {
   return false
 }
 
-export const updateLinks = link => {
+export const updateLink = link => {
   if (!linkExists(links, link)) {
     links.push(link.sort())
   }
@@ -55,20 +55,22 @@ export const updateLinks = link => {
     }
     linkedNodeIds.push(linkId)
   })
-  console.log(links)
+}
+
+export const updateLinks = links => {
+  links.forEach(link => {
+    updateLink(link)
+  })
 }
 
 export const getLinks = () => {
   return links
 }
 
-export const getLinkedNodeIds = () => {
-  return pairedNodeIds
-}
-
 export const isPaired = id => {
   return !_.find(pairedNodeIds, id)
 }
+
 export const isLinked = id => {
   return _.find(linkedNodeIds, id)
 }

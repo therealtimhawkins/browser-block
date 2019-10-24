@@ -73,7 +73,7 @@ export default {
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         Network.updatePairedNodes({ id, node });
-        Network.updateLinks([id, this.$store.getters.id]);
+        Network.updateLink([id, this.$store.getters.id]);
 
         logger("Paired nodes", Network.getPairedNodes().length);
         if (!reply) {
@@ -97,12 +97,8 @@ export default {
       Actions.makeTransaction(this);
     },
     showNodeList() {
-      logger("Node list", Network.getLinkedNodeIds());
-    },
-    updateLinks(links) {
-      links.forEach(link => {
-        Network.updateLinks(link);
-      });
+      logger("Paired node list", Network.getPairedNodeIds());
+      logger("Links list", Network.getLinks());
     },
     dataRouter(data) {
       router(data, this);

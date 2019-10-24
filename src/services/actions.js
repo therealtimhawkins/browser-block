@@ -49,7 +49,7 @@ export const transferPair = (Peer, connRequest) => {
   sendData(
     {
       action: 'TRANSFER_PAIR',
-      id: this.$store.getters.id,
+      id: Peer.$store.getters.id,
       body: {
         request: connRequest
       }
@@ -58,7 +58,7 @@ export const transferPair = (Peer, connRequest) => {
   )
 }
 
-const sendData = (data, nodes, blockedNodeIds = []) => {
+export const sendData = (data, nodes, blockedNodeIds = []) => {
   nodes.forEach(nodeObject => {
     if (!_.includes(blockedNodeIds, nodeObject.id)) {
       nodeObject.node.send(JSON.stringify(data))

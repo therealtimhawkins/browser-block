@@ -41,12 +41,16 @@ export default {
     updateNodes() {
       Network.getLinkedNodeIds().forEach(nodeId => {
         if (!this.nodeExists(nodeId)) {
-          this.nodes.push({ id: nodeId, _color: "light-gray" });
+          this.nodes.push({
+            id: nodeId,
+            _color: "gray",
+            _labelClass: "network-node"
+          });
         }
       });
 
       Network.getLinks().forEach(link => {
-        this.links.push({ sid: link[0], tid: link[1], _color: "red" });
+        this.links.push({ sid: link[0], tid: link[1], _color: "gray" });
       });
     },
     nodeExists(id) {
