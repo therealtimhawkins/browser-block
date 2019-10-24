@@ -9,7 +9,7 @@ export const pair = (Peer, node) => {
       id: Peer.$store.getters.id,
       body: {
         pairedNodeIds: Network.getPairedNodeIds(),
-        links: Peer.$store.getters.links,
+        links: Network.getLinks(),
         transactions
       }
     })
@@ -22,7 +22,7 @@ export const makeTransaction = Peer => {
     id: Peer.$store.getters.id,
     body: {
       pairedNodeIds: Network.getPairedNodeIds(),
-      links: Peer.$store.getters.links,
+      links: Network.getLinks(),
       message: `Transaction sent from ID=${Peer.$store.getters.id}`
     },
     history: [Peer.$store.getters.id]
@@ -38,7 +38,7 @@ export const networkUpdate = Peer => {
       id: Peer.$store.getters.id,
       body: {
         pairedNodeIds: Network.getPairedNodeIds(),
-        links: Peer.$store.getters.links
+        links: Network.getLinks()
       }
     },
     Network.getPairedNodes()
@@ -54,7 +54,7 @@ export const transferPair = (Peer, connRequest) => {
         request: connRequest
       }
     },
-    Peer.$store.getters.pairedNodes
+    Network.getPairedNodes()
   )
 }
 

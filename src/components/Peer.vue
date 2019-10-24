@@ -44,17 +44,17 @@ export default {
       logger("Polling queue...");
       this.pollingQueue = setInterval(async () => {
         const connRequest = await Connection.get(this.$store.getters.id);
-        const isLinked = this.$store.getters.isLinked(connRequest.requestId);
+        const isLinked = Network.isLinked(connRequest.requestId);
         if (
           connRequest.requestId &&
           !isLinked &&
-          this.$store.getters.pairedNodes.length < this.maxNodes
+          Network.getPairedNodes().length < this.maxNodes
         ) {
           logger("Connection ID", connRequest);
           this.connectToPeer(connRequest.requestId);
         } else if (
           connRequest.requestId &&
-          this.$store.getters.pairedNodes.length === this.maxNodes
+          Network.getPairedNodes().length === this.maxNodes
         ) {
           Actions.transferPair(Peer, connRequest);
         }
@@ -69,13 +69,13 @@ export default {
       }
     },
     connectToPeer(id, reply = false) {
-      const noOfPairedNodes = this.$store.getters.pairedNodes.length;
+      const noOfPairedNodes = Network.getPairedNodes().length;
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         Network.updatePairedNodes({ id, node });
         this.$store.commit("updateLinks", [id, this.$store.getters.id]);
 
-        logger("Paired nodes", this.$store.getters.pairedNodes.length);
+        logger("Paired nodes", Network.getPairedNodes().length);
         if (!reply) {
           node.on("open", () => {
             Actions.pair(this, node);
@@ -83,7 +83,7 @@ export default {
         }
       }
 
-      if (this.$store.getters.pairedNodes.length === this.maxNodes) {
+      if (Network.getPairedNodes().length === this.maxNodes) {
         logger("Reached node max", this.maxNodes);
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
@@ -97,11 +97,11 @@ export default {
       Actions.makeTransaction(this);
     },
     showNodeList() {
-      logger("Node list", this.$store.getters.linkedNodeIds);
+      logger("Node list", Network.getLinkedNodeIds());
     },
     updateLinks(links) {
       links.forEach(link => {
-        this.$store.commit("updateLinks", link);
+        Network.updateLinks(link);
       });
     },
     dataRouter(data) {

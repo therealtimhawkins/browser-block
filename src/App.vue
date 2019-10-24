@@ -32,7 +32,7 @@ export default {
   created() {
     if (!this.id) {
       this.id = uuidv1();
-      Network.setId(this.id);
+      // Network.setId(this.id);
       this.$store.commit("addId", this.id);
     }
     logger("ID", this.id);

@@ -4,7 +4,7 @@
 
 <script>
 import D3Network from "vue-d3-network";
-import { mapState } from "vuex";
+import * as Network from "../services/network/index";
 
 export default {
   name: "Network",
@@ -23,7 +23,6 @@ export default {
       }
     };
   },
-  computed: mapState(["linkedNodeIds"]),
   watch: {
     linkedNodeIds() {
       this.updateNodes();
@@ -40,14 +39,14 @@ export default {
   },
   methods: {
     updateNodes() {
-      this.$store.getters.linkedNodeIds.forEach(nodeId => {
+      Network.getLinkedNodeIds().forEach(nodeId => {
         if (!this.nodeExists(nodeId)) {
-          this.nodes.push({ id: nodeId });
+          this.nodes.push({ id: nodeId, _color: "light-gray" });
         }
       });
 
-      this.$store.getters.links.forEach(link => {
-        this.links.push({ sid: link[0], tid: link[1], _color: "gray" });
+      Network.getLinks().forEach(link => {
+        this.links.push({ sid: link[0], tid: link[1], _color: "red" });
       });
     },
     nodeExists(id) {
