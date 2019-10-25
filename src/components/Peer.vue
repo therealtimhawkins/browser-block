@@ -1,6 +1,6 @@
 <template>
   <section>
-    <div class="title is-5 has-text-link" id="id-title">{{this.$store.getters.id}}</div>
+    <div class="title is-5 has-text-link" id="id-title">{{this.id}}</div>
     <div class="buttons">
       <button @click="requestConnection" class="button" id="join-network">Join network</button>
       <button @click="sendTransaction" class="button" id="send-message">Send message</button>
@@ -22,6 +22,7 @@ export default {
   name: "Peer",
   data: () => {
     return {
+      id: null,
       peer: null,
       pollingQueue: null,
       pairedNodes: [],
@@ -29,7 +30,8 @@ export default {
     };
   },
   created() {
-    this.peer = Network.initPeer(this.$store.getters.id);
+    this.peer = Network.initPeer(Network.getId());
+    this.id = Network.getId();
     this.peer.on("connection", connection => {
       connection.on("data", data => {
         logger("Data recieved", data);
@@ -43,7 +45,7 @@ export default {
     pollQueue() {
       logger("Polling queue...");
       this.pollingQueue = setInterval(async () => {
-        const connRequest = await Connection.get(this.$store.getters.id);
+        const connRequest = await Connection.get(Network.getId());
         const isLinked = Network.isLinked(connRequest.requestId);
         if (
           connRequest.requestId &&
@@ -61,8 +63,8 @@ export default {
       }, 2000);
     },
     async requestConnection() {
-      const success = await Connection.request(this.$store.getters.id);
-      logger(`Connection with ${this.$store.getters.id}`, { status: success });
+      const success = await Connection.request(Network.getId());
+      logger(`Connection with ${Network.getId()}`, { status: success });
       if (success) {
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
@@ -73,7 +75,7 @@ export default {
       if (noOfPairedNodes < this.maxNodes) {
         const node = this.peer.connect(id);
         Network.updatePairedNodes({ id, node });
-        Network.updateLink([id, this.$store.getters.id]);
+        Network.updateLink([id, Network.getId()]);
 
         logger("Paired nodes", Network.getPairedNodes().length);
         if (!reply) {

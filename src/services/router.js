@@ -19,7 +19,7 @@ export const router = (data, Peer) => {
       ) {
         Peer.connectToPeer(data.body.request.requestId)
       } else {
-        Peer.sendData(
+        Actions.sendData(
           {
             action: 'TRANSFER_PAIR',
             body: {
@@ -40,7 +40,7 @@ export const router = (data, Peer) => {
       logTransaction(data)
 
       Network.updateLinks(data.body.links)
-      data.history.push(Peer.$store.getters.id)
+      data.history.push(Network.getId())
       Actions.sendData(data, Network.getPairedNodes(), data.history)
       break
     default:

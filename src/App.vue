@@ -12,7 +12,7 @@
 <script>
 import Logs from "./components/Logs.vue";
 import NetworkGraph from "./components/Network";
-import * as Network from "./components/Network";
+import * as Network from "./services/network/index";
 import * as uuidv1 from "uuid/v1";
 import { logger } from "./services/logger";
 
@@ -32,8 +32,7 @@ export default {
   created() {
     if (!this.id) {
       this.id = uuidv1();
-      // Network.setId(this.id);
-      this.$store.commit("addId", this.id);
+      Network.setId(this.id);
     }
     logger("ID", this.id);
   },

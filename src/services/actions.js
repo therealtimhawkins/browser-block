@@ -6,7 +6,7 @@ export const pair = (Peer, node) => {
   node.send(
     JSON.stringify({
       action: 'PAIR',
-      id: Peer.$store.getters.id,
+      id: Network.getId(),
       body: {
         pairedNodeIds: Network.getPairedNodeIds(),
         links: Network.getLinks(),
@@ -16,26 +16,26 @@ export const pair = (Peer, node) => {
   )
 }
 
-export const makeTransaction = Peer => {
+export const makeTransaction = () => {
   const data = {
     action: 'TRANSACTION',
-    id: Peer.$store.getters.id,
+    id: Network.getId(),
     body: {
       pairedNodeIds: Network.getPairedNodeIds(),
       links: Network.getLinks(),
-      message: `Transaction sent from ID=${Peer.$store.getters.id}`
+      message: `Transaction sent from ID=${Network.getId()}`
     },
-    history: [Peer.$store.getters.id]
+    history: [Network.getId()]
   }
   sendData(data, Network.getPairedNodes())
   logTransaction(data)
 }
 
-export const networkUpdate = Peer => {
+export const networkUpdate = () => {
   sendData(
     {
       action: 'NETWORK_UPDATE',
-      id: Peer.$store.getters.id,
+      id: Network.getId(),
       body: {
         pairedNodeIds: Network.getPairedNodeIds(),
         links: Network.getLinks()
@@ -49,7 +49,7 @@ export const transferPair = (Peer, connRequest) => {
   sendData(
     {
       action: 'TRANSFER_PAIR',
-      id: Peer.$store.getters.id,
+      id: Network.getId(),
       body: {
         request: connRequest
       }

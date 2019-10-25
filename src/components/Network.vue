@@ -18,7 +18,7 @@ export default {
       options: {
         force: 3000,
         nodeSize: 20,
-        nodeLabels: true,
+        nodeLabels: false,
         linkWidth: 1
       }
     };
@@ -30,7 +30,7 @@ export default {
   },
   created() {
     this.nodes.push({
-      id: this.$store.getters.id,
+      id: Network.getId(),
       _color: "coral"
     });
   },
@@ -43,8 +43,7 @@ export default {
         if (!this.nodeExists(nodeId)) {
           this.nodes.push({
             id: nodeId,
-            _color: "gray",
-            _labelClass: "network-node"
+            _color: "gray"
           });
         }
       });
