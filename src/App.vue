@@ -12,9 +12,6 @@
 <script>
 import Logs from "./components/Logs.vue";
 import NetworkGraph from "./components/Network";
-import * as Network from "./services/network/index";
-import * as uuidv1 from "uuid/v1";
-import { logger } from "./services/logger";
 
 export default {
   name: "app",
@@ -28,13 +25,6 @@ export default {
       network: false,
       logs: true
     };
-  },
-  created() {
-    if (!this.id) {
-      this.id = uuidv1();
-      Network.setId(this.id);
-    }
-    logger("ID", this.id);
   },
   methods: {
     selectView(view) {

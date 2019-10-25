@@ -1,16 +1,13 @@
 import Peer from 'peerjs'
 import _ from 'lodash'
+import * as uuidv1 from 'uuid/v1'
 
-let id
+let id = uuidv1()
 let peer
 const pairedNodes = []
 const pairedNodeIds = []
 const links = []
 const linkedNodeIds = []
-
-export const setId = newId => {
-  id = newId
-}
 
 export const getId = () => {
   return id
