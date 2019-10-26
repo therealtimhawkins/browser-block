@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { logTransaction, transactions } from '../../transactions'
+import { logTransaction, transactions } from '../data/transactions'
 import * as Network from '../controller/index'
 
 export const pair = node => {

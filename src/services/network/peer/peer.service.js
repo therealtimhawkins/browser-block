@@ -1,7 +1,7 @@
 import * as Actions from '../actions/index'
-import * as Connection from '../../handshake'
+import * as Connection from './peer.server'
 import * as Network from '../controller/index'
-import { logger } from '../../logger'
+import { logger } from '../data/logger'
 
 export const connectToPeer = (id, Peer, reply = false) => {
   const noOfPairedNodes = Network.getPairedNodes().length
@@ -41,7 +41,7 @@ export const pollConnection = async Peer => {
     Network.getPairedNodes().length < Network.maxNodes
   ) {
     logger('Connection ID', connRequest)
-    connectToPeer(connRequest.requestId, Peer)
+    return connectToPeer(connRequest.requestId, Peer)
   } else if (
     connRequest.requestId &&
     Network.getPairedNodes().length === Network.maxNodes

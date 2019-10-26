@@ -12,23 +12,20 @@
 
 <script>
 import * as Network from "../services/network/controller/index";
-import { logger } from "../services/logger";
+import { logger } from "../services/network/data/logger";
 import { router } from "../services/network/router/index";
 import * as Actions from "../services/network/actions/index";
 import {
   pollConnection,
   requestConnection
-} from "../services/network/peer/index";
+} from "../services/network/peer/peer.service";
 
 export default {
   name: "Peer",
   data: () => {
     return {
       id: null,
-      peer: null,
-      pollingQueue: null,
-      pairedNodes: [],
-      maxNodes: 3
+      pollingQueue: null
     };
   },
   created() {
@@ -42,20 +39,18 @@ export default {
       this.pollingQueue = setInterval(async () => {
         const result = await pollConnection();
         if (result === "Reached node max") {
+          console.log("node max");
           clearInterval(this.pollingQueue);
           this.pollingQueue = false;
         }
         if (result === "Pair successful") {
+          console.log("pair successful hit");
           this.pollQueue();
         }
       }, 2000);
     },
     async requestConnection() {
-      const result = await requestConnection();
-      if (result) {
-        clearInterval(this.pollingQueue);
-        this.pollingQueue = false;
-      }
+      requestConnection();
     },
     sendTransaction() {
       Actions.makeTransaction(this);

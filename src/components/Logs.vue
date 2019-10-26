@@ -57,8 +57,8 @@
 
 <script>
 import Peer from "./Peer";
-import { logs } from "../services/logger";
-import { transactions } from "../services/transactions";
+import { logs } from "../services/network/data/logger";
+import { transactions } from "../services/network/data/transactions";
 import VueJsonPretty from "vue-json-pretty";
 const { deepParseJson } = require("deep-parse-json");
 
