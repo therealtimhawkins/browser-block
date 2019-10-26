@@ -39,12 +39,10 @@ export default {
       this.pollingQueue = setInterval(async () => {
         const result = await pollConnection();
         if (result === "Reached node max") {
-          console.log("node max");
           clearInterval(this.pollingQueue);
           this.pollingQueue = false;
         }
         if (result === "Pair successful") {
-          console.log("pair successful hit");
           this.pollQueue();
         }
       }, 2000);
