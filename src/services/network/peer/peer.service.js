@@ -1,6 +1,6 @@
-import * as Actions from '../actions/index'
+import * as Actions from '../actions/actions.service'
 import * as Connection from './peer.server'
-import * as Network from '../controller/index'
+import * as Network from '../controller/controller.service'
 import { logger } from '../data/logger'
 
 export const connectToPeer = (id, reply = false) => {

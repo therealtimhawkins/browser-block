@@ -1,7 +1,7 @@
 import { logger } from '../data/logger'
 import { logTransaction, initTransactions } from '../data/transactions'
-import * as Network from '../controller/index'
-import * as Actions from '../actions/index'
+import * as Network from '../controller/controller.service'
+import * as Actions from '../actions/actions.service'
 import { connectToPeer } from '../peer/peer.service'
 
 export const router = data => {

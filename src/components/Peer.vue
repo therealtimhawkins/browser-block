@@ -11,9 +11,9 @@
 </template>
 
 <script>
-import * as Network from "../services/network/controller/index";
+import * as Network from "../services/network/controller/controller.service";
 import { logger } from "../services/network/data/logger";
-import * as Actions from "../services/network/actions/index";
+import * as Actions from "../services/network/actions/actions.service";
 import {
   pollConnection,
   requestConnection
