@@ -11,14 +11,12 @@
 </template>
 
 <script>
-import Peer from "peerjs";
 import * as Network from "../services/network/index";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Connection from "../services/handshake";
 import * as Actions from "../services/actions";
 import { connectToPeer, requestConnection } from "../services/peer/index";
-import { request } from "http";
 
 export default {
   name: "Peer",
@@ -60,7 +58,7 @@ export default {
           connRequest.requestId &&
           Network.getPairedNodes().length === this.maxNodes
         ) {
-          Actions.transferPair(Peer, connRequest);
+          Actions.transferPair(connRequest);
         }
       }, 2000);
     },

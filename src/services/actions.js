@@ -45,7 +45,7 @@ export const networkUpdate = () => {
   )
 }
 
-export const transferPair = (Peer, connRequest) => {
+export const transferPair = connRequest => {
   sendData(
     {
       action: 'TRANSFER_PAIR',
