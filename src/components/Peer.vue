@@ -29,7 +29,7 @@ export default {
     };
   },
   created() {
-    this.peer = Network.initPeer(Network.getId());
+    this.peer = Network.initPeer();
     this.id = Network.getId();
     this.peer.on("connection", connection => {
       connection.on("data", data => {

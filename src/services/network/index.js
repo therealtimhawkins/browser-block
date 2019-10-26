@@ -13,7 +13,7 @@ export const getId = () => {
   return id
 }
 
-export const initPeer = id => {
+export const initPeer = () => {
   peer = new Peer(id)
   return peer
 }
