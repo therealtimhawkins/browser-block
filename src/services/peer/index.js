@@ -37,3 +37,21 @@ export const requestConnection = async Peer => {
     Peer.pollingQueue = false
   }
 }
+
+export const pollConnection = async Peer => {
+  const connRequest = await Connection.get(Network.getId())
+  const isLinked = Network.isLinked(connRequest.requestId)
+  if (
+    connRequest.requestId &&
+    !isLinked &&
+    Network.getPairedNodes().length < Peer.maxNodes
+  ) {
+    logger('Connection ID', connRequest)
+    connectToPeer(connRequest.requestId, Peer)
+  } else if (
+    connRequest.requestId &&
+    Network.getPairedNodes().length === Peer.maxNodes
+  ) {
+    Actions.transferPair(connRequest)
+  }
+}
