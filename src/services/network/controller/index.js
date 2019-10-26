@@ -2,7 +2,7 @@ import Peer from 'peerjs'
 import _ from 'lodash'
 import * as uuidv1 from 'uuid/v1'
 import { logger } from '../data/logger'
-import { router } from '../router'
+import { router } from '../router/router.service'
 
 const id = uuidv1()
 export let peer

@@ -3,7 +3,7 @@ import * as Connection from './peer.server'
 import * as Network from '../controller/index'
 import { logger } from '../data/logger'
 
-export const connectToPeer = (id, Peer, reply = false) => {
+export const connectToPeer = (id, reply = false) => {
   const noOfPairedNodes = Network.getPairedNodes().length
   if (noOfPairedNodes < Network.maxNodes) {
     const node = Network.peer.connect(id)

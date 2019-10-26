@@ -13,7 +13,6 @@
 <script>
 import * as Network from "../services/network/controller/index";
 import { logger } from "../services/network/data/logger";
-import { router } from "../services/network/router/index";
 import * as Actions from "../services/network/actions/index";
 import {
   pollConnection,
@@ -56,9 +55,6 @@ export default {
     showNodeList() {
       logger("Paired node list", Network.getPairedNodeIds());
       logger("Links list", Network.getLinks());
-    },
-    dataRouter(data) {
-      router(data, this);
     }
   }
 };
