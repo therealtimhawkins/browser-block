@@ -6,7 +6,7 @@ import { logger } from '../../logger'
 export const connectToPeer = (id, Peer, reply = false) => {
   const noOfPairedNodes = Network.getPairedNodes().length
   if (noOfPairedNodes < Network.maxNodes) {
-    const node = Peer.peer.connect(id)
+    const node = Network.peer.connect(id)
     Network.updatePairedNodes({ id, node })
     Network.updateLink([id, Network.getId()])
 

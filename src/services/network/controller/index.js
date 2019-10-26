@@ -1,9 +1,11 @@
 import Peer from 'peerjs'
 import _ from 'lodash'
 import * as uuidv1 from 'uuid/v1'
+import { logger } from '../../logger'
+import { router } from '../router'
 
 const id = uuidv1()
-let peer
+export let peer
 export const maxNodes = 3
 const pairedNodes = []
 const pairedNodeIds = []
@@ -14,8 +16,14 @@ export const getId = () => {
   return id
 }
 
-export const initPeer = () => {
+export const initPeer = myPeer => {
   peer = new Peer(id)
+  peer.on('connection', connection => {
+    connection.on('data', data => {
+      logger('Data recieved', data)
+      router(JSON.parse(data), myPeer)
+    })
+  })
   return peer
 }
 

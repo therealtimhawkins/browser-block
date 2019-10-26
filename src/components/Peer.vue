@@ -32,15 +32,8 @@ export default {
     };
   },
   created() {
-    this.peer = Network.initPeer();
+    Network.initPeer();
     this.id = Network.getId();
-    this.peer.on("connection", connection => {
-      connection.on("data", data => {
-        logger("Data recieved", data);
-        this.dataRouter(JSON.parse(data));
-      });
-    });
-
     this.pollQueue();
   },
   methods: {
