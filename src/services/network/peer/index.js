@@ -17,16 +17,13 @@ export const connectToPeer = (id, Peer, reply = false) => {
       })
     }
   }
+  Actions.networkUpdate()
 
   if (Network.getPairedNodes().length === Network.maxNodes) {
     logger('Reached node max', Network.maxNodes)
-    clearInterval(Peer.pollingQueue)
-    Peer.pollingQueue = false
-  } else {
-    Peer.pollQueue()
+    return 'Reached node max'
   }
-
-  Actions.networkUpdate()
+  return 'Pair successful'
 }
 
 export const requestConnection = async () => {
@@ -50,5 +47,6 @@ export const pollConnection = async Peer => {
     Network.getPairedNodes().length === Network.maxNodes
   ) {
     Actions.transferPair(connRequest)
+    return 'Transfer pair'
   }
 }
