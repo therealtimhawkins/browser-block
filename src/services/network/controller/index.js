@@ -65,6 +65,10 @@ export const getLinks = () => {
   return links
 }
 
+export const getLinkedNodeIds = () => {
+  return linkedNodeIds
+}
+
 export const isPaired = id => {
   return !_.find(pairedNodeIds, id)
 }

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { logTransaction, transactions } from './transactions'
-import * as Network from './network/index'
+import * as Network from './network/controller/index'
 
 export const pair = (Peer, node) => {
   node.send(

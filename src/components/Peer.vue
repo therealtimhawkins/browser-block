@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import * as Network from "../services/network/index";
+import * as Network from "../services/network/controller/index";
 import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Actions from "../services/actions";

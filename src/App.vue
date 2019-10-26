@@ -1,9 +1,9 @@
 <template>
   <section id="app" class="section">
-    <div class="buttons">
+    <!-- <div class="buttons">
       <button @click="selectView('logs')" class="button" id="logs-button">Logs</button>
       <button @click="selectView('network')" class="button" id="network-button">Network</button>
-    </div>
+    </div>-->
     <NetworkGraph v-if="this.network" />
     <Logs v-if="this.logs" />
   </section>

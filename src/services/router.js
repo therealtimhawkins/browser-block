@@ -1,6 +1,6 @@
 import { logger } from './logger'
 import { logTransaction, initTransactions } from './transactions'
-import * as Network from './network/index'
+import * as Network from './network/controller/index'
 import * as Actions from './actions'
 import { connectToPeer } from '../services/peer/index'
 

@@ -4,7 +4,7 @@
 
 <script>
 import D3Network from "vue-d3-network";
-import * as Network from "../services/network/index";
+import * as Network from "../services/network/controller/index";
 
 export default {
   name: "Network",
