@@ -13,9 +13,12 @@
 <script>
 import * as Network from "../services/network/controller/index";
 import { logger } from "../services/logger";
-import { router } from "../services/router";
+import { router } from "../services/network/router/index";
 import * as Actions from "../services/actions";
-import { pollConnection, requestConnection } from "../services/peer/index";
+import {
+  pollConnection,
+  requestConnection
+} from "../services/network/peer/index";
 
 export default {
   name: "Peer",

@@ -1,7 +1,7 @@
-import * as Actions from '../actions'
-import * as Connection from '../handshake'
-import * as Network from '../network/controller/index'
-import { logger } from '../logger'
+import * as Actions from '../../actions'
+import * as Connection from '../../handshake'
+import * as Network from '../controller/index'
+import { logger } from '../../logger'
 
 export const connectToPeer = (id, Peer, reply = false) => {
   const noOfPairedNodes = Network.getPairedNodes().length
