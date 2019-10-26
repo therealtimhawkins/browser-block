@@ -14,7 +14,7 @@
 import * as Network from "../services/network/controller/index";
 import { logger } from "../services/logger";
 import { router } from "../services/network/router/index";
-import * as Actions from "../services/actions";
+import * as Actions from "../services/network/actions/index";
 import {
   pollConnection,
   requestConnection

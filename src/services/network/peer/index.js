@@ -1,4 +1,4 @@
-import * as Actions from '../../actions'
+import * as Actions from '../actions/index'
 import * as Connection from '../../handshake'
 import * as Network from '../controller/index'
 import { logger } from '../../logger'
@@ -26,7 +26,7 @@ export const connectToPeer = (id, Peer, reply = false) => {
     Peer.pollQueue()
   }
 
-  Actions.networkUpdate(Peer)
+  Actions.networkUpdate()
 }
 
 export const requestConnection = async Peer => {
