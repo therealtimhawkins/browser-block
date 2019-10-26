@@ -13,7 +13,7 @@ export const connectToPeer = (id, Peer, reply = false) => {
     logger('Paired nodes', Network.getPairedNodes().length)
     if (!reply) {
       node.on('open', () => {
-        Actions.pair(Peer, node)
+        Actions.pair(node)
       })
     }
   }

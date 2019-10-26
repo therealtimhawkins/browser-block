@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { logTransaction, transactions } from './transactions'
 import * as Network from './network/controller/index'
 
-export const pair = (Peer, node) => {
+export const pair = node => {
   node.send(
     JSON.stringify({
       action: 'PAIR',
