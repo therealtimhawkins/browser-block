@@ -2,8 +2,9 @@ import Peer from 'peerjs'
 import _ from 'lodash'
 import * as uuidv1 from 'uuid/v1'
 
-let id = uuidv1()
+const id = uuidv1()
 let peer
+export const maxNodes = 3
 const pairedNodes = []
 const pairedNodeIds = []
 const links = []
