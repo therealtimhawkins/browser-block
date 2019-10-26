@@ -1,5 +1,5 @@
 import * as axios from 'axios'
-import { logger } from '../services/logger'
+import { logger } from './logger'
 
 export const request = async id => {
   const response = await axios({

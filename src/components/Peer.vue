@@ -17,7 +17,8 @@ import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Connection from "../services/handshake";
 import * as Actions from "../services/actions";
-import { connectToPeer } from "../services/peer/index";
+import { connectToPeer, requestConnection } from "../services/peer/index";
+import { request } from "http";
 
 export default {
   name: "Peer",
@@ -64,12 +65,7 @@ export default {
       }, 2000);
     },
     async requestConnection() {
-      const success = await Connection.request(Network.getId());
-      logger(`Connection with ${Network.getId()}`, { status: success });
-      if (success) {
-        clearInterval(this.pollingQueue);
-        this.pollingQueue = false;
-      }
+      requestConnection(this);
     },
     sendTransaction() {
       Actions.makeTransaction(this);

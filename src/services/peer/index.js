@@ -1,4 +1,5 @@
 import * as Actions from '../actions'
+import * as Connection from '../handshake'
 import * as Network from '../network/index'
 import { logger } from '../logger'
 
@@ -26,4 +27,13 @@ export const connectToPeer = (id, Peer, reply = false) => {
   }
 
   Actions.networkUpdate(Peer)
+}
+
+export const requestConnection = async Peer => {
+  const success = await Connection.request(Network.getId())
+  logger(`Connection with ${Network.getId()}`, { status: success })
+  if (success) {
+    clearInterval(Peer.pollingQueue)
+    Peer.pollingQueue = false
+  }
 }
