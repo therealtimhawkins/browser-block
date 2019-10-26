@@ -44,7 +44,11 @@ export default {
       }, 2000);
     },
     async requestConnection() {
-      requestConnection(this);
+      const result = await requestConnection();
+      if (result) {
+        clearInterval(this.pollingQueue);
+        this.pollingQueue = false;
+      }
     },
     sendTransaction() {
       Actions.makeTransaction(this);

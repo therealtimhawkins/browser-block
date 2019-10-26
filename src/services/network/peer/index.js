@@ -29,13 +29,10 @@ export const connectToPeer = (id, Peer, reply = false) => {
   Actions.networkUpdate()
 }
 
-export const requestConnection = async Peer => {
+export const requestConnection = async () => {
   const success = await Connection.request(Network.getId())
   logger(`Connection with ${Network.getId()}`, { status: success })
-  if (success) {
-    clearInterval(Peer.pollingQueue)
-    Peer.pollingQueue = false
-  }
+  return success
 }
 
 export const pollConnection = async Peer => {
