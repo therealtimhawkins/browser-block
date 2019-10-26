@@ -2,6 +2,7 @@ import { logger } from './logger'
 import { logTransaction, initTransactions } from './transactions'
 import * as Network from './network/index'
 import * as Actions from './actions'
+import { connectToPeer } from '../services/peer/index'
 
 export const router = (data, Peer) => {
   logger('Router action', data.action)
@@ -9,7 +10,7 @@ export const router = (data, Peer) => {
     case 'PAIR':
       initTransactions(data.body.transactions)
       Network.updateLinks(data.body.links)
-      Peer.connectToPeer(data.id, true)
+      connectToPeer(data.id, Peer, true)
       break
     case 'TRANSFER_PAIR':
       logger('Transfer data', data.body)
@@ -17,7 +18,7 @@ export const router = (data, Peer) => {
         !Network.isPaired(data.body.request.requestId) &&
         !Network.isLinked(data.body.request.requestId)
       ) {
-        Peer.connectToPeer(data.body.request.requestId)
+        connectToPeer(data.body.request.requestId, Peer)
       } else {
         Actions.sendData(
           {

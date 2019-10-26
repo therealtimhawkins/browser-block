@@ -17,6 +17,7 @@ import { logger } from "../services/logger";
 import { router } from "../services/router";
 import * as Connection from "../services/handshake";
 import * as Actions from "../services/actions";
+import { connectToPeer } from "../services/peer/index";
 
 export default {
   name: "Peer",
@@ -53,7 +54,7 @@ export default {
           Network.getPairedNodes().length < this.maxNodes
         ) {
           logger("Connection ID", connRequest);
-          this.connectToPeer(connRequest.requestId);
+          connectToPeer(connRequest.requestId, this);
         } else if (
           connRequest.requestId &&
           Network.getPairedNodes().length === this.maxNodes
@@ -69,31 +70,6 @@ export default {
         clearInterval(this.pollingQueue);
         this.pollingQueue = false;
       }
-    },
-    connectToPeer(id, reply = false) {
-      const noOfPairedNodes = Network.getPairedNodes().length;
-      if (noOfPairedNodes < this.maxNodes) {
-        const node = this.peer.connect(id);
-        Network.updatePairedNodes({ id, node });
-        Network.updateLink([id, Network.getId()]);
-
-        logger("Paired nodes", Network.getPairedNodes().length);
-        if (!reply) {
-          node.on("open", () => {
-            Actions.pair(this, node);
-          });
-        }
-      }
-
-      if (Network.getPairedNodes().length === this.maxNodes) {
-        logger("Reached node max", this.maxNodes);
-        clearInterval(this.pollingQueue);
-        this.pollingQueue = false;
-      } else {
-        this.pollQueue();
-      }
-
-      Actions.networkUpdate(this);
     },
     sendTransaction() {
       Actions.makeTransaction(this);
